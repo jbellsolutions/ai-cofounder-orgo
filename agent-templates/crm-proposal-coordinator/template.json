@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "template_id": "crm-proposal-coordinator",
+  "display_name": "CRM & Proposal Coordinator",
+  "default_profile_name": "crm-proposal-coordinator",
+  "manager": "revenue-partner",
+  "description": "Prepares clean CRM data, follow-up plans, pipeline hygiene, and private proposal drafts without sending or mutating production records.",
+  "capabilities": ["crm-analysis", "pipeline-hygiene", "proposal-drafting", "follow-up-planning"],
+  "external_writes": false,
+  "credentials": [],
+  "requires_human_approval": true
+}

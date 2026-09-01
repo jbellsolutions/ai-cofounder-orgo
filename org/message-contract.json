@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "message_types": ["REQUEST", "COUNTER", "COMMIT", "STATUS", "REVIEW", "ACCEPT", "REWORK", "ESCALATE"],
+  "required_request_fields": [
+    "task_id",
+    "sender",
+    "requested_role",
+    "objective",
+    "deliverable",
+    "deadline_or_priority",
+    "allowed_actions",
+    "approval_boundary",
+    "evidence_required",
+    "acceptance_tests"
+  ],
+  "commit_fields": ["task_id", "assignee", "scope", "due", "budget", "acceptance_tests"],
+  "rules": [
+    "A2A messages reference a Kanban task for durable work.",
+    "A counter may change scope, timing, dependencies, or risk but not authority.",
+    "A commitment is not permission for a consequential external action.",
+    "An agent cannot accept its own independently reviewed work.",
+    "Unresolved authority, budget, privacy, legal, or reputation questions escalate upward."
+  ]
+}

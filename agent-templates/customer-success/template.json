@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "template_id": "customer-success",
+  "display_name": "Customer Success Agent",
+  "default_profile_name": "customer-success",
+  "manager": "head-of-ops",
+  "description": "Organizes onboarding, delivery follow-through, customer health, feedback, retention signals, and private response drafts.",
+  "capabilities": ["onboarding", "customer-health", "delivery-follow-up", "feedback-analysis", "retention-analysis"],
+  "external_writes": false,
+  "credentials": [],
+  "requires_human_approval": true
+}

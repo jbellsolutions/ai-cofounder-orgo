@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "template_id": "systems-automation",
+  "display_name": "Systems & Automation Agent",
+  "default_profile_name": "systems-automation",
+  "manager": "head-of-ops",
+  "description": "Maps, drafts, tests, and documents bounded internal automations after the manual process and approval boundary are clear.",
+  "capabilities": ["process-mapping", "automation-design", "testing", "documentation", "monitoring-design"],
+  "external_writes": false,
+  "credentials": [],
+  "requires_human_approval": true
+}

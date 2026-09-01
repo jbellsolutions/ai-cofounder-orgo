@@ -1,0 +1,160 @@
+{
+  "schema_version": 1,
+  "organization": "Generic AI Co-Founder",
+  "authority_root": "human-owner",
+  "coordination": {
+    "conversation": ["bot-mode", "a2a"],
+    "workflow_source_of_truth": "kanban",
+    "authority_source_of_truth": "policies/permissions.json",
+    "full_mesh_communication": true,
+    "hierarchical_command": true
+  },
+  "profiles": [
+    {
+      "id": "default",
+      "display_name": "AI Co-Founder",
+      "manager": "human-owner",
+      "department": "executive",
+      "role_type": "orchestrator",
+      "description": "Executive operating partner that turns owner intent into strategy, coordinated work, reviewed decisions, and measurable business progress.",
+      "role_skill": "company/ai-cofounder",
+      "toolsets": {
+        "cli": ["file", "web", "browser", "memory", "skills", "todo", "kanban", "a2a", "delegation", "cronjob", "clarify", "vision", "image_gen", "computer_use", "mcp-agent-factory"],
+        "slack": ["file", "web", "browser", "memory", "skills", "todo", "kanban", "a2a", "clarify", "vision", "mcp-agent-factory"],
+        "telegram": ["session_search", "memory", "todo", "kanban", "a2a", "clarify"],
+        "a2a": ["session_search", "memory", "file", "web", "kanban"]
+      },
+      "kanban": {
+        "may_own_root": true,
+        "may_create_children": true,
+        "requires_independent_review": true
+      },
+      "a2a": {
+        "enabled": true,
+        "path": "/",
+        "tenant": "cofounder",
+        "capabilities": ["strategy", "orchestration", "prioritization", "decision-briefs"]
+      }
+    },
+    {
+      "id": "head-of-ops",
+      "display_name": "Head of Operations",
+      "manager": "default",
+      "department": "operations",
+      "role_type": "leader",
+      "description": "Owns execution systems, priorities, projects, calendars, inboxes, documents, processes, and operating cadence.",
+      "role_skill": "business/head-of-ops",
+      "toolsets": {
+        "cli": ["file", "web", "browser", "memory", "skills", "todo", "kanban", "a2a", "clarify", "vision", "computer_use"],
+        "a2a": ["session_search", "memory", "file", "web", "kanban"]
+      },
+      "kanban": {
+        "may_own_root": false,
+        "may_create_children": true,
+        "requires_independent_review": true
+      },
+      "a2a": {
+        "enabled": true,
+        "path": "/head-of-ops",
+        "tenant": "head-of-ops",
+        "capabilities": ["operations", "project-management", "calendar", "documents", "process-design"]
+      }
+    },
+    {
+      "id": "revenue-partner",
+      "display_name": "Revenue Partner",
+      "manager": "default",
+      "department": "revenue",
+      "role_type": "leader",
+      "description": "Owns offer fit, go-to-market architecture, pipeline, revenue experiments, CRM discipline, proposals, and commercial reporting.",
+      "role_skill": "go-to-market/revenue-partner",
+      "toolsets": {
+        "cli": ["file", "web", "browser", "memory", "skills", "todo", "kanban", "a2a", "clarify", "vision", "computer_use"],
+        "a2a": ["session_search", "memory", "file", "web", "kanban"]
+      },
+      "kanban": {
+        "may_own_root": false,
+        "may_create_children": true,
+        "requires_independent_review": true
+      },
+      "a2a": {
+        "enabled": true,
+        "path": "/revenue-partner",
+        "tenant": "revenue-partner",
+        "capabilities": ["go-to-market", "pipeline", "offers", "crm", "proposals", "revenue-analysis"]
+      }
+    },
+    {
+      "id": "affiliate-revenue-partner",
+      "display_name": "Affiliate Revenue Partner",
+      "manager": "revenue-partner",
+      "department": "revenue",
+      "role_type": "specialist",
+      "description": "Designs and operates evidence-led affiliate and partner programs while leaving terms, commitments, and relationship ownership with approved humans.",
+      "role_skill": "go-to-market/affiliate-revenue-partner",
+      "toolsets": {
+        "cli": ["file", "web", "browser", "memory", "skills", "todo", "kanban", "a2a", "clarify", "vision"],
+        "a2a": ["session_search", "memory", "file", "web", "kanban"]
+      },
+      "kanban": {
+        "may_own_root": false,
+        "may_create_children": true,
+        "requires_independent_review": true
+      },
+      "a2a": {
+        "enabled": true,
+        "path": "/affiliate-revenue-partner",
+        "tenant": "affiliate-revenue-partner",
+        "capabilities": ["affiliates", "partnerships", "recruiting", "enablement", "partner-reporting"]
+      }
+    },
+    {
+      "id": "finance-risk",
+      "display_name": "Finance & Risk Lead",
+      "manager": "default",
+      "department": "finance-risk",
+      "role_type": "reviewer",
+      "description": "Evaluates economics, forecasts, budgets, evidence quality, downside, compliance questions, and approval requirements; never acts as legal or financial counsel.",
+      "role_skill": "finance/finance-risk",
+      "toolsets": {
+        "cli": ["file", "web", "memory", "skills", "todo", "kanban", "a2a", "clarify"],
+        "a2a": ["session_search", "memory", "file", "web", "kanban"]
+      },
+      "kanban": {
+        "may_own_root": false,
+        "may_create_children": false,
+        "requires_independent_review": false
+      },
+      "a2a": {
+        "enabled": true,
+        "path": "/finance-risk",
+        "tenant": "finance-risk",
+        "capabilities": ["unit-economics", "forecasting", "budget-review", "risk-review", "evidence-review"]
+      }
+    },
+    {
+      "id": "research-analysis",
+      "display_name": "Research & Analysis Lead",
+      "manager": "default",
+      "department": "intelligence",
+      "role_type": "worker",
+      "description": "Finds, validates, compares, and summarizes evidence with citations, provenance, uncertainty, and clear decision relevance.",
+      "role_skill": "research/research-analysis",
+      "toolsets": {
+        "cli": ["file", "web", "browser", "memory", "skills", "todo", "kanban", "a2a", "clarify", "vision"],
+        "a2a": ["session_search", "memory", "file", "web", "kanban"]
+      },
+      "kanban": {
+        "may_own_root": false,
+        "may_create_children": false,
+        "requires_independent_review": true
+      },
+      "a2a": {
+        "enabled": true,
+        "path": "/research-analysis",
+        "tenant": "research-analysis",
+        "capabilities": ["research", "source-validation", "competitive-analysis", "synthesis", "fact-checking"]
+      }
+    }
+  ]
+}

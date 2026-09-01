@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "template_id": "content-distribution",
+  "display_name": "Content & Distribution Agent",
+  "default_profile_name": "content-distribution",
+  "manager": "revenue-partner",
+  "description": "Researches, drafts, repurposes, calendars, and measures approved content; publishing remains approval-gated.",
+  "capabilities": ["content-research", "drafting", "repurposing", "editorial-calendar", "content-analysis"],
+  "external_writes": false,
+  "credentials": [],
+  "requires_human_approval": true
+}
