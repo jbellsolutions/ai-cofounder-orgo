@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import importlib.util
 import os
 from pathlib import Path
 import re
@@ -95,6 +96,8 @@ class RepositoryContractTests(unittest.TestCase):
             "audit.alter_or_delete",
             "profile.delete",
             "infrastructure.delete",
+            "agent_identity.payment_method_change",
+            "fleet.skip_canary",
         ):
             self.assertIn(action, policy["always_deny_to_agents"])
 
@@ -141,6 +144,10 @@ class RepositoryContractTests(unittest.TestCase):
             "tool_loop_guardrails.hard_stop_enabled",
             "approvals.mode",
             "mcp_servers.agent-factory",
+            "mcp_servers.agent-cards",
+            "mcp_servers.agentmail",
+            "mcp_servers.agentphone",
+            "mcp_servers.latitude",
         ):
             self.assertIn(required, source)
         self.assertIn('settings[f"platform_toolsets.{platform}"]', source)
@@ -207,6 +214,7 @@ class RepositoryContractTests(unittest.TestCase):
             self.assertIn("# AI Co-Founder", (hermes_home / "SOUL.md").read_text())
             self.assertTrue((hermes_home / "cofounder/company/01-CONSTITUTION.md").is_file())
             self.assertTrue((hermes_home / "cofounder/services/agent_factory_mcp.py").is_file())
+            self.assertTrue((hermes_home / "plugins/latitude-observer/plugin.yaml").is_file())
             for profile in EXPECTED_PROFILES - {"default"}:
                 profile_home = hermes_home / "profiles" / profile
                 self.assertTrue((profile_home / "SOUL.md").is_file(), profile)
@@ -217,6 +225,128 @@ class RepositoryContractTests(unittest.TestCase):
             command_log = log.read_text()
             self.assertIn("gateway.platforms.a2a.enabled false", command_log)
             self.assertIn("mcp_servers.agent-factory.enabled false", command_log)
+            self.assertIn("mcp_servers.agent-cards.enabled false", command_log)
+            self.assertIn("mcp_servers.latitude.enabled false", command_log)
+
+            existing = hermes_home / "profiles/head-of-ops/.env"
+            existing.write_text(existing.read_text() + "CUSTOM_CONNECTOR_FIXTURE=preserved\n")
+            second = subprocess.run(
+                [
+                    sys.executable,
+                    str(ROOT / "services/install_profiles.py"),
+                    "--root", str(ROOT),
+                    "--home", str(hermes_home),
+                    "--mode", "all",
+                ],
+                env=env,
+                text=True,
+                capture_output=True,
+            )
+            self.assertEqual(0, second.returncode, second.stdout + second.stderr)
+            self.assertIn("CUSTOM_CONNECTOR_FIXTURE=preserved", existing.read_text())
+
+    def test_managed_stack_versions_scopes_and_privacy_are_explicit(self):
+        manifest = load("stack/manifest.json")
+        self.assertEqual("2026.09.01.1", manifest["stack_version"])
+        bundle = manifest["components"]["agent_bundle"]
+        self.assertEqual("0.2.2", bundle["version"])
+        self.assertEqual("default-profile-only-mediated-to-team-over-a2a", bundle["scope"])
+        self.assertFalse(bundle["production_cards_default"])
+        latitude = manifest["components"]["latitude"]
+        self.assertEqual("metadata", latitude["default_capture_mode"])
+        self.assertEqual("sanitized", latitude["semantic_capture_mode"])
+        registry = {profile["id"]: profile for profile in load("org/registry.json")["profiles"]}
+        for tool in ("mcp-agent-cards", "mcp-agentmail", "mcp-agentphone", "mcp-latitude"):
+            self.assertIn(tool, registry["default"]["toolsets"]["cli"])
+        for profile_id in EXPECTED_PROFILES - {"default"}:
+            self.assertNotIn("mcp-agent-cards", registry[profile_id]["toolsets"]["cli"])
+
+    def test_agent_bundle_import_is_atomic_and_never_prints_credentials(self):
+        with tempfile.TemporaryDirectory() as directory:
+            fixture = Path(directory)
+            home = fixture / ".hermes"
+            config = fixture / "bundle.json"
+            config.write_text(json.dumps({"mcpServers": {
+                "agent-cards": {"url": "https://example.invalid/mcp"},
+                "agentmail": {"headers": {"x-api-key": "mail-fixture"}},
+                "agentphone": {"env": {"AGENTPHONE_API_KEY": "phone-fixture"}},
+            }}))
+            bin_dir = fixture / "bin"
+            bin_dir.mkdir()
+            fake = bin_dir / "hermes"
+            fake.write_text("#!/usr/bin/env bash\nexit 0\n")
+            fake.chmod(0o755)
+            result = subprocess.run(
+                [sys.executable, str(ROOT / "services/import_agent_bundle.py"), "--config", str(config), "--home", str(home), "--sandbox"],
+                env={**os.environ, "PATH": f"{bin_dir}:{os.environ.get('PATH', '')}"},
+                text=True,
+                capture_output=True,
+            )
+            self.assertEqual(0, result.returncode, result.stderr)
+            self.assertNotIn("mail-fixture", result.stdout + result.stderr)
+            self.assertNotIn("phone-fixture", result.stdout + result.stderr)
+            self.assertEqual(0o600, (home / ".env").stat().st_mode & 0o777)
+
+    def test_latitude_observer_defaults_to_metadata_and_registers_every_hook(self):
+        path = ROOT / "plugins/latitude-observer/__init__.py"
+        spec = importlib.util.spec_from_file_location("latitude_observer_test", path)
+        self.assertIsNotNone(spec)
+        module = importlib.util.module_from_spec(spec)
+        sys.modules[spec.name] = module
+        spec.loader.exec_module(module)
+        with mock.patch.dict(os.environ, {"LATITUDE_CAPTURE_MODE": "metadata"}, clear=False):
+            self.assertIsNone(module._content({"private": "fixture"}))
+        with (
+            mock.patch.dict(os.environ, {"LATITUDE_CAPTURE_MODE": "sanitized"}, clear=False),
+            mock.patch.object(module, "_redact", return_value="[REDACTED]"),
+        ):
+            self.assertEqual("[REDACTED]", module._content({"private": "fixture"}))
+        class Context:
+            def __init__(self):
+                self.hooks = []
+            def register_hook(self, name, callback):
+                self.hooks.append((name, callback))
+        context = Context()
+        module.register(context)
+        self.assertIn("pre_tool_call", {name for name, _ in context.hooks})
+        self.assertIn("on_session_finalize", {name for name, _ in context.hooks})
+
+    def test_fleet_inventory_and_remote_commands_are_bounded(self):
+        sys.path.insert(0, str(ROOT / "services"))
+        import fleet_manager
+
+        example = load("fleet/inventory.example.json")
+        self.assertEqual(2, len(fleet_manager.validate_inventory(example)))
+        active = json.loads(json.dumps(example))
+        active["targets"] = [active["targets"][0]]
+        active["targets"][0]["enabled"] = True
+        targets = fleet_manager.validate_inventory(active, require_canary=True)
+        script = fleet_manager.remote_script(targets[0], "a" * 40, "run-123", "deploy")
+        self.assertIn("fleet_node.py", script)
+        self.assertNotIn("eval", script)
+        active["targets"][0]["repository"] = "https://github.com/untrusted/example.git"
+        with self.assertRaisesRegex(ValueError, "allowlist"):
+            fleet_manager.validate_inventory(active, require_canary=True)
+
+    def test_fleet_node_snapshot_restores_managed_state_without_touching_env(self):
+        sys.path.insert(0, str(ROOT / "services"))
+        import fleet_node
+
+        with tempfile.TemporaryDirectory() as directory:
+            home = Path(directory) / "home"
+            state = home / ".local/state/ai-guy-fleet"
+            hermes = home / ".hermes"
+            state.mkdir(parents=True)
+            hermes.mkdir(parents=True)
+            (hermes / "config.yaml").write_text("mode: before\n")
+            (hermes / ".env").write_text("PRIVATE_FIXTURE=unchanged\n")
+            backup = fleet_node.snapshot(home, state, "test-run")
+            (hermes / "config.yaml").write_text("mode: after\n")
+            (hermes / "SOUL.md").write_text("new file\n")
+            fleet_node.restore(home, backup)
+            self.assertEqual("mode: before\n", (hermes / "config.yaml").read_text())
+            self.assertFalse((hermes / "SOUL.md").exists())
+            self.assertEqual("PRIVATE_FIXTURE=unchanged\n", (hermes / ".env").read_text())
 
     def test_slack_manifest_is_ai_cofounder_and_owner_controllable(self):
         manifest = load("slack-manifest.json")

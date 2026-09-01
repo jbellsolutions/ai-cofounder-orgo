@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "fleet_name": "AI Guy managed agents",
+  "allowed_github_owners": [
+    "jbellsolutions"
+  ],
+  "targets": [
+    {
+      "id": "ai-guy-cofounder",
+      "display_name": "AI Co-Founder",
+      "provider": "orgo",
+      "computer_id": "00000000-0000-4000-8000-000000000000",
+      "repository": "https://github.com/jbellsolutions/ai-cofounder-orgo.git",
+      "channel": "canary",
+      "enabled": false
+    },
+    {
+      "id": "example-digitalocean-agent",
+      "display_name": "Example DigitalOcean agent",
+      "provider": "ssh",
+      "ssh_host": "replace-with-ssh-config-name",
+      "repository": "https://github.com/jbellsolutions/replace-with-agent-repository.git",
+      "channel": "stable",
+      "enabled": false
+    }
+  ]
+}

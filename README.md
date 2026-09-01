@@ -12,6 +12,8 @@ role, durable work queue, and safe way to collaborate.
 
 [**Start the walkthrough →**](START-HERE.md) ·
 [Give this link to another AI](AGENTS.md) ·
+[Managed agent stack](docs/MANAGED-AGENT-STACK.md) ·
+[Update every agent](docs/FLEET-UPDATES.md) ·
 [Meet the team](docs/TEAM.md) ·
 [See the architecture](docs/ARCHITECTURE.md) ·
 [Understand A2A](docs/A2A.md)
@@ -114,6 +116,8 @@ done so a new AI chat can begin without needing this conversation.
 | Coordination | Hermes Bot Mode, durable Kanban tasks, profile descriptions, reviews, and handoffs |
 | A2A | One authenticated gateway with a separate Agent Card and route for every profile |
 | Agent Factory | Controlled proposals and activation from approved templates; no autonomous deletion or infrastructure spending |
+| Managed stack | Honcho memory for every profile, Agent Bundle company identity, and Latitude traces/evaluations |
+| Fleet updates | Canary-first Orgo and DigitalOcean releases with exact commits, health gates, and local rollback |
 | Business tools | Guided Calendar, inbox, Drive, CRM, and app connection through Composio plus PandaDoc proposals |
 | Channels | Slack Agent view and Telegram, connected to the Co-Founder by default |
 | Safety | Role-specific toolsets, manual approvals, peer allowlists, anti-loop limits, audit logs, and an emergency stop |
@@ -139,11 +143,13 @@ separate computers. [Architecture details →](docs/ARCHITECTURE.md)
 2. Clone this repository and run `./orgo/setup.sh`.
 3. Connect the model with `hermes setup`.
 4. Run `./orgo/create-team.sh` to create the leadership profiles.
-5. Connect Slack or Telegram with `./orgo/connect-channels.sh`.
-6. Connect Calendar, inbox, CRM, and proposals with
+5. Connect Honcho, Agent Bundle, and Latitude with
+   `./orgo/connect-agent-stack.sh`.
+6. Connect Slack or Telegram with `./orgo/connect-channels.sh`.
+7. Connect Calendar, inbox, CRM, and proposals with
    `./orgo/connect-tools.sh`.
-7. Add private cross-computer peers with `./orgo/connect-a2a.sh`.
-8. Run `./orgo/verify.sh` and complete the real-message test.
+8. Add private cross-computer peers with `./orgo/connect-a2a.sh`.
+9. Run `./orgo/verify.sh` and complete the real-message test.
 
 The screen-by-screen version is [START-HERE.md](START-HERE.md).
 
@@ -163,6 +169,8 @@ The screen-by-screen version is [START-HERE.md](START-HERE.md).
 | [Slack](docs/SLACK-SETUP.md) | Manifest, private tokens, allowlist, and live test |
 | [Telegram](docs/TELEGRAM-SETUP.md) | Bot token, owner allowlist, and direct-message test |
 | [Tools](docs/TOOLS.md) | Calendar, inbox, Drive, CRM, proposals, and safe first tests |
+| [Managed agent stack](docs/MANAGED-AGENT-STACK.md) | Honcho, Agent Bundle, Latitude, A2A, ownership, and privacy |
+| [Fleet updates](docs/FLEET-UPDATES.md) | One-request updates across Orgo and DigitalOcean with canary and rollback |
 | [Skills](docs/SKILLS.md) | Shared and role skills, updates, review, and safe installation |
 | [Operations](docs/OPERATIONS.md) | Daily brief, weekly business review, emergency stop, backup, and updates |
 | [Verification](docs/VERIFICATION.md) | Automated checks and live acceptance tests |

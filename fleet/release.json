@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "stack_version": "2026.09.01.1",
+  "release_channel": "stable",
+  "managed_repository": "https://github.com/jbellsolutions/ai-cofounder-orgo.git",
+  "managed_ref": "refs/heads/main",
+  "canary_target": "ai-guy-cofounder",
+  "rollout": {
+    "canary_first": true,
+    "automatic_rollback_on_failure": true,
+    "promotion_requires_exact_phrase": true,
+    "maximum_parallel_targets": 1
+  },
+  "preserves": [
+    "credentials",
+    "oauth-sessions",
+    "agent-conversations",
+    "honcho-memory",
+    "customer-files",
+    "local-customizations-outside-managed-files"
+  ],
+  "installs": [
+    "cofounder-and-leadership-profiles",
+    "a2a-routes-and-policy",
+    "honcho-provider-support",
+    "agent-bundle-definitions",
+    "latitude-observer-and-mcp-definition",
+    "fleet-update-contract"
+  ]
+}

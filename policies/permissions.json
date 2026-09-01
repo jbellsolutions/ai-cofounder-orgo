@@ -43,10 +43,18 @@
   "actions": {
     "research.read": {"tier": 0, "decision": "allow", "roles": ["all"]},
     "draft.private": {"tier": 0, "decision": "allow", "roles": ["all"]},
+    "memory.honcho_read": {"tier": 0, "decision": "allow", "roles": ["all"]},
+    "observability.read": {"tier": 0, "decision": "allow", "roles": ["default", "head-of-ops", "finance-risk"]},
+    "agent_identity.inbox_read": {"tier": 0, "decision": "allow", "roles": ["default"]},
     "kanban.update_assigned": {"tier": 1, "decision": "allow", "roles": ["all"]},
     "kanban.create_root": {"tier": 1, "decision": "allow", "roles": ["default"]},
     "kanban.create_child": {"tier": 1, "decision": "allow", "roles": ["default", "head-of-ops", "revenue-partner", "affiliate-revenue-partner"]},
+    "memory.honcho_write": {"tier": 1, "decision": "allow", "roles": ["all"]},
+    "fleet.plan_or_status": {"tier": 1, "decision": "allow", "roles": ["default", "head-of-ops"]},
     "external.message_send": {"tier": 2, "decision": "approval", "roles": ["default", "head-of-ops", "revenue-partner", "affiliate-revenue-partner"]},
+    "agent_identity.email_send": {"tier": 2, "decision": "approval", "roles": ["default"]},
+    "agent_identity.sms_or_call": {"tier": 2, "decision": "approval", "roles": ["default"]},
+    "observability.annotate": {"tier": 2, "decision": "approval", "roles": ["default", "head-of-ops", "finance-risk"]},
     "external.publish": {"tier": 2, "decision": "approval", "roles": ["default", "revenue-partner", "affiliate-revenue-partner"]},
     "calendar.mutate": {"tier": 2, "decision": "approval", "roles": ["default", "head-of-ops"]},
     "crm.mutate": {"tier": 2, "decision": "approval", "roles": ["default", "revenue-partner"]},
@@ -54,7 +62,10 @@
     "commercial.set_terms": {"tier": 3, "decision": "approval", "roles": ["human-owner"]},
     "financial.spend": {"tier": 3, "decision": "approval", "roles": ["human-owner"]},
     "integration.add": {"tier": 3, "decision": "approval", "roles": ["human-owner"]},
+    "agent_identity.card_issue_or_fund": {"tier": 3, "decision": "approval", "roles": ["human-owner"]},
     "profile.activate": {"tier": 3, "decision": "approval", "roles": ["human-owner"]},
+    "fleet.canary_or_promote": {"tier": 3, "decision": "approval", "roles": ["human-owner"]},
+    "fleet.rollback": {"tier": 3, "decision": "approval", "roles": ["human-owner"]},
     "infrastructure.create_or_resize": {"tier": 3, "decision": "approval", "roles": ["human-owner"]},
     "data.delete": {"tier": 4, "decision": "approval-and-verify", "roles": ["human-owner"]}
   },
@@ -67,7 +78,11 @@
     "profile.delete",
     "infrastructure.delete",
     "security.disable",
-    "peer.trust_unknown"
+    "peer.trust_unknown",
+    "agent_identity.payment_method_change",
+    "observability.key_manage",
+    "fleet.inventory_delete",
+    "fleet.skip_canary"
   ],
   "approval_record_required": [
     "request_id",

@@ -17,8 +17,8 @@ Read AGENTS.md, START-HERE.md, and docs/ORGO-SETUP.md before changing anything.
 Use my Orgo account and the maintained Hermes template. Handle every technical
 step yourself. Walk me through private approvals one screen at a time. Never
 display, repeat, log, or commit a key. Connect the model first, create the team,
-connect Slack, and then add Telegram, Calendar, inbox, CRM, and PandaDoc if I
-authorize them. Finish only when a real message gets a reply and
+connect the managed stack, connect Slack, and then add Telegram, Calendar,
+inbox, CRM, and PandaDoc if I authorize them. Finish only when a real message gets a reply and
 ./orgo/verify.sh passes without exposing a secret.
 ```
 
@@ -110,7 +110,16 @@ we are building, who we help, the offer, the current numbers, and the next
 It fills the private company operating files only after the owner confirms each
 summary. The public GitHub copy remains generic.
 
-## Step 5 — Connect Slack
+## Step 5 — Connect memory, company identity, and visibility
+
+The setup agent runs `./orgo/connect-agent-stack.sh` and handles the technical
+work. The owner completes only private account verification. Honcho gives each
+profile a separate memory identity, Agent Bundle gives the Co-Founder one
+company inbox/phone/TEST-mode card, and Latitude monitors all profiles. Start
+Latitude in metadata-only mode unless conversation-level evaluation is both
+wanted and permitted. See [the managed stack guide](docs/MANAGED-AGENT-STACK.md).
+
+## Step 6 — Connect Slack
 
 Create the Slack app from [`slack-manifest.json`](slack-manifest.json), install
 it into the intended workspace, and then run:
@@ -129,13 +138,13 @@ Prove three things:
 3. Ask it to create a private research task. Confirm the task appears in
    Kanban and the Research & Analysis profile returns a result.
 
-## Step 6 — Add Telegram if wanted
+## Step 7 — Add Telegram if wanted
 
 Run `./orgo/connect-channels.sh` again, choose Telegram, create the bot with
 `@BotFather`, enter the token in the hidden prompt, and send `hello`.
 Telegram uses outbound long-polling and requires no public inbound port.
 
-## Step 7 — Connect business tools
+## Step 8 — Connect business tools
 
 Run:
 
@@ -152,7 +161,7 @@ List three recent inbox subject lines. Do not send, move, or change anything.
 Create a private draft proposal titled "Connection Test". Do not send it.
 ```
 
-## Step 8 — Connect another computer with A2A
+## Step 9 — Connect another computer with A2A
 
 For the compact webinar version, every local profile already has an A2A route.
 To connect a separate Funding Revenue Partner or another computer, join both
@@ -166,7 +175,7 @@ The helper uses separate inbound and outbound tokens, an authenticated peer
 identity, a trusted-peer allowlist, and a three-turn anti-loop limit. It never
 opens an unauthenticated public A2A port.
 
-## Step 9 — Finish with proof
+## Step 10 — Finish with proof
 
 Run:
 

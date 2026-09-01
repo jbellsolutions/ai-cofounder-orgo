@@ -13,6 +13,11 @@ records, private conversations, or a populated company knowledge base.
 Private values live only in the intended Hermes profile `.env`, protected
 credential store, or connected service. Secret-bearing files use mode `600`.
 
+Latitude tracing defaults to metadata only. Sanitized semantic capture must be
+an explicit privacy choice and omits content entirely if the Hermes redaction
+layer is unavailable. Agent Bundle credentials remain on the default profile
+and are never copied to every worker.
+
 ## Trust boundaries
 
 - The human owner is the highest authority.
@@ -31,6 +36,11 @@ calendar or CRM, sending a proposal, spending money, changing prices or
 affiliate terms, signing or accepting an agreement, granting account access,
 creating or resizing infrastructure, disclosing sensitive information, or
 performing destructive work.
+
+Fleet updates additionally require one enabled canary, exact Git commits, an
+unchanged private inventory, a run-specific approval record, sequential
+promotion, and local rollback snapshots. The updater has no computer deletion,
+billing, resizing, credential rotation, or permission-expansion operation.
 
 The Agent Factory exposes no delete, infrastructure, billing, credential,
 permission-expansion, or arbitrary-command tool. Persistent profile activation

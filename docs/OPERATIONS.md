@@ -51,10 +51,11 @@ sensitive business information.
 
 ## Updates
 
-Do not track `latest`. Review a new Hermes release, update the tag, commit, and
-installer hash together, run repository tests, deploy to a non-production
-clone, test identity/tool denials/A2A/Kanban/restart, then promote. Owner-modified
-SOUL and skills are preserved by the managed-seed manifest.
+Say “Update all of my agents to the approved release” to a setup AI with this
+repository. It follows the canary, verification, promotion, and rollback
+contract in [Fleet updates](FLEET-UPDATES.md). Do not track `latest`. Runtime
+upgrades remain separately reviewed and pinned. Owner-modified SOUL and skills
+are preserved by the managed-seed manifest.
 
 ## Customer isolation
 
