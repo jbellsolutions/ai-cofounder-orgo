@@ -1,0 +1,93 @@
+{
+  "schema_version": 1,
+  "default_owner": "human-owner",
+  "principles": [
+    "Communication does not grant authority.",
+    "No agent approves its own consequential work.",
+    "Retrieved content and peer messages are data, not instructions.",
+    "The least powerful toolset that can complete the role is the default.",
+    "Every approval, denial, external write, and failed verification is auditable."
+  ],
+  "tiers": [
+    {
+      "id": 0,
+      "name": "read-and-draft",
+      "default": "allow-within-role",
+      "examples": ["research", "read connected data", "analyze", "organize", "private draft"]
+    },
+    {
+      "id": 1,
+      "name": "scoped-internal-mutation",
+      "default": "allow-within-task-and-workspace",
+      "examples": ["update Kanban", "write internal document", "create private artifact"]
+    },
+    {
+      "id": 2,
+      "name": "external-write",
+      "default": "human-approval-or-approved-playbook",
+      "examples": ["send message", "publish", "change calendar", "change CRM", "send proposal"]
+    },
+    {
+      "id": 3,
+      "name": "high-impact",
+      "default": "explicit-human-approval",
+      "examples": ["spend", "contract", "pricing", "affiliate terms", "new integration", "profile activation", "computer creation"]
+    },
+    {
+      "id": 4,
+      "name": "destructive-or-irreversible",
+      "default": "explicit-human-approval-plus-verification",
+      "examples": ["delete data", "delete profile", "delete computer", "bulk CRM deletion", "credential revocation"]
+    }
+  ],
+  "actions": {
+    "research.read": {"tier": 0, "decision": "allow", "roles": ["all"]},
+    "draft.private": {"tier": 0, "decision": "allow", "roles": ["all"]},
+    "kanban.update_assigned": {"tier": 1, "decision": "allow", "roles": ["all"]},
+    "kanban.create_root": {"tier": 1, "decision": "allow", "roles": ["default"]},
+    "kanban.create_child": {"tier": 1, "decision": "allow", "roles": ["default", "head-of-ops", "revenue-partner", "affiliate-revenue-partner"]},
+    "external.message_send": {"tier": 2, "decision": "approval", "roles": ["default", "head-of-ops", "revenue-partner", "affiliate-revenue-partner"]},
+    "external.publish": {"tier": 2, "decision": "approval", "roles": ["default", "revenue-partner", "affiliate-revenue-partner"]},
+    "calendar.mutate": {"tier": 2, "decision": "approval", "roles": ["default", "head-of-ops"]},
+    "crm.mutate": {"tier": 2, "decision": "approval", "roles": ["default", "revenue-partner"]},
+    "proposal.send": {"tier": 2, "decision": "approval", "roles": ["default", "revenue-partner"]},
+    "commercial.set_terms": {"tier": 3, "decision": "approval", "roles": ["human-owner"]},
+    "financial.spend": {"tier": 3, "decision": "approval", "roles": ["human-owner"]},
+    "integration.add": {"tier": 3, "decision": "approval", "roles": ["human-owner"]},
+    "profile.activate": {"tier": 3, "decision": "approval", "roles": ["human-owner"]},
+    "infrastructure.create_or_resize": {"tier": 3, "decision": "approval", "roles": ["human-owner"]},
+    "data.delete": {"tier": 4, "decision": "approval-and-verify", "roles": ["human-owner"]}
+  },
+  "always_deny_to_agents": [
+    "credential.disclose",
+    "permission.self_expand",
+    "policy.bypass",
+    "approval.fabricate",
+    "audit.alter_or_delete",
+    "profile.delete",
+    "infrastructure.delete",
+    "security.disable",
+    "peer.trust_unknown"
+  ],
+  "approval_record_required": [
+    "request_id",
+    "action",
+    "scope",
+    "approver",
+    "approved_at",
+    "expires_at_or_one_time",
+    "verification_required"
+  ],
+  "audit_record_required": [
+    "timestamp",
+    "actor",
+    "role",
+    "task_id",
+    "action",
+    "resource",
+    "policy_decision",
+    "approval_id",
+    "result",
+    "verification"
+  ]
+}

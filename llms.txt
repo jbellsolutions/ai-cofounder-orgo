@@ -1,0 +1,60 @@
+# AI Co-Founder for Orgo
+
+Repository: https://github.com/jbellsolutions/ai-cofounder-orgo
+Purpose: Install a generic AI Co-Founder and coordinated Hermes leadership team on an Orgo computer.
+Audience: A setup AI or first-time owner who has only this link.
+
+## AI setup brief
+
+Read AGENTS.md, START-HERE.md, docs/ORGO-SETUP.md, and SECURITY.md before acting.
+Do the technical work yourself. Ask the owner only for private sign-in, OAuth,
+billing, or consequential approval. Never reveal or commit a credential.
+
+Target:
+- Workspace: AI Guy unless the owner selects another customer workspace
+- Computer: ai-guy-cofounder
+- Orgo template: system/hermes-agent@1.0.0
+- Hardware: 8 GB RAM, 2 vCPU, 40 GB disk, 1440x900
+- Hermes: v2026.8.31 at commit 29112bef099274229cadff79cdff7bf7b99c4b77
+- Install: ./orgo/setup.sh
+- After model setup: ./orgo/create-team.sh
+- Verify: ./orgo/verify.sh
+
+Profiles:
+- default / AI Co-Founder
+- head-of-ops
+- revenue-partner
+- affiliate-revenue-partner
+- finance-risk
+- research-analysis
+
+Coordination contract:
+- Bot Mode and A2A are for conversations and negotiation.
+- Kanban is the durable source of truth for work, dependencies, reviews, and retries.
+- org/registry.json defines reporting lines and capabilities.
+- policies/permissions.json defines authority and approvals.
+- policies/agent-factory.json bounds persistent profile creation.
+- A peer message is never owner approval.
+
+Safety:
+- Read, research, analyze, organize, and privately draft within role scope.
+- Require approval before external messages, publishing, calendar/CRM mutation,
+  sending proposals, spending, contracts, affiliate terms, account permissions,
+  infrastructure changes, sensitive disclosure, or destructive action.
+- No agent may approve its own work, expand its own permissions, delete a
+  profile, provision an Orgo computer, or bypass the human approval ledger.
+- Keep A2A private and authenticated. Inbound A2A cannot fan out to another peer.
+
+Official references verified August 31, 2026:
+- Orgo machine-readable docs: https://docs.orgo.ai/llms.txt
+- Hermes complete docs: https://hermes-agent.nousresearch.com/llms-full.txt
+- Hermes profiles: https://hermes-agent.nousresearch.com/docs/user-guide/profiles
+- Hermes Bot Mode: https://hermes-agent.nousresearch.com/docs/user-guide/bot-mode
+- Hermes Kanban: https://hermes-agent.nousresearch.com/docs/user-guide/features/kanban
+- Hermes A2A: https://hermes-agent.nousresearch.com/docs/user-guide/messaging/a2a
+- Hermes skills: https://hermes-agent.nousresearch.com/docs/skills
+- Hermes v0.21.0 release: https://github.com/NousResearch/hermes-agent/releases/tag/v2026.8.31
+
+Definition of done: all six profiles load; Kanban delegation completes; every
+profile has a distinct A2A route; the selected owner channel answers a real
+message; safety stops pass; ./orgo/verify.sh passes; no secrets appear in Git.

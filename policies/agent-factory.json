@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "enabled": true,
+  "state_directory": "~/.hermes/cofounder",
+  "max_active_named_profiles": 12,
+  "persistent_activation_requires_human_approval": true,
+  "allowed_template_ids": [
+    "content-distribution",
+    "crm-proposal-coordinator",
+    "customer-success",
+    "systems-automation"
+  ],
+  "activation_defaults": {
+    "manager": "default",
+    "lifespan": "persistent",
+    "toolsets": ["file", "web", "browser", "memory", "skills", "todo", "kanban", "a2a", "clarify", "vision"],
+    "a2a_inbound_toolsets": ["session_search", "memory", "file", "web", "kanban"],
+    "copy_model_connection_from": "default",
+    "copy_human_channel_credentials": false,
+    "copy_business_app_credentials": false,
+    "allow_terminal": false,
+    "allow_external_write_tools": false
+  },
+  "never_exposed_as_factory_tools": [
+    "delete-profile",
+    "delete-data",
+    "provision-computer",
+    "resize-computer",
+    "change-billing",
+    "grant-credential",
+    "change-permissions",
+    "change-policy",
+    "trust-peer",
+    "arbitrary-command"
+  ],
+  "activation_checks": [
+    "template-is-allowlisted",
+    "profile-name-is-valid-and-unused",
+    "manager-exists",
+    "human-approval-record-is-valid",
+    "active-profile-cap-is-not-exceeded",
+    "role-files-pass-validation",
+    "toolsets-do-not-exceed-template",
+    "a2a-route-is-unique",
+    "identity-smoke-test-passes",
+    "permission-stop-test-passes"
+  ]
+}
