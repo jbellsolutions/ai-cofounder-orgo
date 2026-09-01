@@ -13,7 +13,8 @@ Run anywhere with Python 3 and Bash:
 It checks JSON, shell syntax, Python compilation, Markdown links, runtime pins,
 the exact hierarchy, unique A2A routes, role skills, toolsets, inbound A2A
 anti-chaining, permission tiers, permanent denials, Agent Factory approval,
-Slack manifest, and obvious secret patterns.
+managed-stack pins and ownership, Latitude metadata privacy, fleet command
+bounds and snapshot restoration, Slack manifest, and obvious secret patterns.
 
 GitHub Actions runs the same command on every push and pull request.
 
@@ -74,9 +75,12 @@ Then complete these behavioral tests:
    and permission-stop tests.
 10. **Restart:** restart the gateway. Confirm profiles, Kanban work, Bot Chats,
     A2A routes, and audit remain.
-11. **Real channel:** send one owner-authorized Slack or Telegram message and
+11. **Managed stack:** run `./orgo/connect-agent-stack.sh --status`. Confirm
+    Honcho is true for every installed profile, Agent Bundle is owned only by
+    default, and Latitude reports the chosen capture mode without a key value.
+12. **Real channel:** send one owner-authorized Slack or Telegram message and
     receive a reply.
-12. **Secret check:** inspect `git status`, staged diff, and the final report.
+13. **Secret check:** inspect `git status`, staged diff, and the final report.
     No credential or customer data may appear.
 
 Do not say the system is fully working if only repository tests ran. Report

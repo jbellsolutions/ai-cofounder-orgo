@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "stack_version": "2026.09.01.1",
+  "verified_on": "2026-09-01",
+  "components": {
+    "honcho": {
+      "purpose": "reasoning memory and cross-channel continuity",
+      "integration": "native-hermes-memory-provider",
+      "scope": "all-profiles-one-workspace-distinct-ai-peers",
+      "setup_command": "hermes memory setup honcho",
+      "documentation": "https://hermes-agent.nousresearch.com/docs/user-guide/features/honcho"
+    },
+    "agent_bundle": {
+      "purpose": "company inbox, phone number, and controlled payment card",
+      "scope": "default-profile-only-mediated-to-team-over-a2a",
+      "package": "agentbundle-cli",
+      "version": "0.2.2",
+      "integrity": "sha512-hXdLoC8JU+1HUedAAnVD7eiZue+teY7roVv9pCYuqp793GxhbpCkZbNY+yxhnDciA68Bg3BgKh8gt8MGGLcxqA==",
+      "agentphone_mcp_version": "0.7.0",
+      "agentphone_mcp_integrity": "sha512-ijxBPb/L9SQVCZpjqmdU2dZhzuM2iMA1ZWUV/kTnd2W6n6VDtNLNNZMHi2AJvh5xNwBnmXe8kiQIR47z+ciVzA==",
+      "production_cards_default": false,
+      "documentation": "https://theagentbundle.com/"
+    },
+    "latitude": {
+      "purpose": "agent traces, failure discovery, evaluation, and fleet visibility",
+      "observer": "plugins/latitude-observer",
+      "otlp_endpoint": "https://ingest.latitude.so/v1/traces",
+      "mcp_endpoint": "https://api.latitude.so/v1/mcp",
+      "default_capture_mode": "metadata",
+      "semantic_capture_mode": "sanitized",
+      "scope": "one-observer-per-gateway-all-multiplexed-profiles",
+      "documentation": "https://docs.latitude.so/telemetry/otel-exporter"
+    },
+    "a2a": {
+      "purpose": "authenticated role-to-role requests and handoffs",
+      "scope": "all-profiles",
+      "authority_rule": "a2a-message-is-a-request-never-an-approval",
+      "documentation": "https://hermes-agent.nousresearch.com/docs/user-guide/messaging/a2a"
+    }
+  },
+  "activation": {
+    "automatic_on_repository_update": [
+      "install-disabled-mcp-definitions",
+      "install-disabled-latitude-observer",
+      "preserve-existing-secrets-and-oauth"
+    ],
+    "requires_one_time_owner_connection": [
+      "honcho-api-key-or-oauth",
+      "agent-bundle-email-verification",
+      "agentcard-oauth",
+      "latitude-api-key-and-project",
+      "latitude-workspace-oauth"
+    ]
+  }
+}

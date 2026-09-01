@@ -18,6 +18,7 @@ Target:
 - Hermes: v2026.8.31 at commit 29112bef099274229cadff79cdff7bf7b99c4b77
 - Install: ./orgo/setup.sh
 - After model setup: ./orgo/create-team.sh
+- Managed stack: ./orgo/connect-agent-stack.sh
 - Verify: ./orgo/verify.sh
 
 Profiles:
@@ -35,6 +36,22 @@ Coordination contract:
 - policies/permissions.json defines authority and approvals.
 - policies/agent-factory.json bounds persistent profile creation.
 - A peer message is never owner approval.
+- Honcho gives each profile a distinct AI peer in one customer workspace.
+- Agent Bundle credentials stay on the default Co-Founder profile; worker
+  profiles request approved inbox, phone, or card actions over A2A.
+- Latitude defaults to metadata-only traces. Sanitized semantic capture is an
+  explicit owner privacy choice. Raw capture is unavailable.
+
+Fleet update contract:
+- Private inventory: ~/.config/ai-guy/fleet.json
+- Read first: docs/FLEET-UPDATES.md and skills/shared/managed-agent-stack/SKILL.md
+- Orgo transport: workspace-scoped API; DigitalOcean transport: named SSH host
+- Resolve branches to exact Git commits, update one canary, verify, then require
+  run-specific owner approval before sequential promotion.
+- Preserve credentials, OAuth, sessions, memory, customer files, and unmanaged
+  customizations. Restore the local managed-file snapshot on failure.
+- Never infer target identity, skip canary, alter inventory mid-run, change
+  billing, or create/delete a computer through the updater.
 
 Safety:
 - Read, research, analyze, organize, and privately draft within role scope.
@@ -45,15 +62,19 @@ Safety:
   profile, provision an Orgo computer, or bypass the human approval ledger.
 - Keep A2A private and authenticated. Inbound A2A cannot fan out to another peer.
 
-Official references verified August 31, 2026:
+Official references verified September 1, 2026:
 - Orgo machine-readable docs: https://docs.orgo.ai/llms.txt
 - Hermes complete docs: https://hermes-agent.nousresearch.com/llms-full.txt
 - Hermes profiles: https://hermes-agent.nousresearch.com/docs/user-guide/profiles
 - Hermes Bot Mode: https://hermes-agent.nousresearch.com/docs/user-guide/bot-mode
 - Hermes Kanban: https://hermes-agent.nousresearch.com/docs/user-guide/features/kanban
 - Hermes A2A: https://hermes-agent.nousresearch.com/docs/user-guide/messaging/a2a
+- Hermes Honcho: https://hermes-agent.nousresearch.com/docs/user-guide/features/honcho
 - Hermes skills: https://hermes-agent.nousresearch.com/docs/skills
 - Hermes v0.21.0 release: https://github.com/NousResearch/hermes-agent/releases/tag/v2026.8.31
+- Agent Bundle: https://theagentbundle.com/
+- Latitude OTLP: https://docs.latitude.so/telemetry/otel-exporter
+- Latitude MCP: https://docs.latitude.so/getting-started/mcp
 
 Definition of done: all six profiles load; Kanban delegation completes; every
 profile has a distinct A2A route; the selected owner channel answers a real

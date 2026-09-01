@@ -23,8 +23,11 @@ python3 -m json.tool "$REPO_DIR/org/message-contract.json" >/dev/null
 python3 -m json.tool "$REPO_DIR/policies/permissions.json" >/dev/null
 python3 -m json.tool "$REPO_DIR/policies/agent-factory.json" >/dev/null
 python3 -m json.tool "$REPO_DIR/slack-manifest.json" >/dev/null
+python3 -m json.tool "$REPO_DIR/stack/manifest.json" >/dev/null
+python3 -m json.tool "$REPO_DIR/fleet/release.json" >/dev/null
+python3 -m json.tool "$REPO_DIR/fleet/inventory.example.json" >/dev/null
 find "$REPO_DIR/orgo" -type f -name '*.sh' -print0 | xargs -0 bash -n
-python3 -m compileall -q "$REPO_DIR/services" "$REPO_DIR/tests"
+python3 -m compileall -q "$REPO_DIR/services" "$REPO_DIR/plugins" "$REPO_DIR/tests"
 python3 -m unittest discover -s "$REPO_DIR/tests" -p 'test_*.py' -v
 
 if [ "$STATIC_ONLY" = true ]; then
@@ -37,6 +40,7 @@ command -v hermes >/dev/null 2>&1 || { echo "Hermes is not installed." >&2; exit
 [ -f "$HERMES_HOME/skills/roles/ai-cofounder/SKILL.md" ]
 [ -f "$HERMES_HOME/cofounder/assets/policies/permissions.json" ]
 [ -f "$HERMES_HOME/cofounder/services/agent_factory_mcp.py" ]
+[ -f "$HERMES_HOME/plugins/latitude-observer/plugin.yaml" ]
 
 installed=""
 for candidate in /usr/local/lib/hermes-agent "$HERMES_HOME/hermes-agent"; do

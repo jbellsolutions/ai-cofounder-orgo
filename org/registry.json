@@ -19,8 +19,8 @@
       "description": "Executive operating partner that turns owner intent into strategy, coordinated work, reviewed decisions, and measurable business progress.",
       "role_skill": "company/ai-cofounder",
       "toolsets": {
-        "cli": ["file", "web", "browser", "memory", "skills", "todo", "kanban", "a2a", "delegation", "cronjob", "clarify", "vision", "image_gen", "computer_use", "mcp-agent-factory"],
-        "slack": ["file", "web", "browser", "memory", "skills", "todo", "kanban", "a2a", "clarify", "vision", "mcp-agent-factory"],
+        "cli": ["file", "web", "browser", "memory", "skills", "todo", "kanban", "a2a", "delegation", "cronjob", "clarify", "vision", "image_gen", "computer_use", "mcp-agent-factory", "mcp-agent-cards", "mcp-agentmail", "mcp-agentphone", "mcp-latitude"],
+        "slack": ["file", "web", "browser", "memory", "skills", "todo", "kanban", "a2a", "clarify", "vision", "mcp-agent-factory", "mcp-agentmail", "mcp-agentphone", "mcp-latitude"],
         "telegram": ["session_search", "memory", "todo", "kanban", "a2a", "clarify"],
         "a2a": ["session_search", "memory", "file", "web", "kanban"]
       },

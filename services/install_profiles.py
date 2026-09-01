@@ -63,6 +63,12 @@ def config_set(profile: str, key: str, value: Any) -> None:
         raise RuntimeError(f"could not set {key} for {profile}: {result.stderr.strip()}")
 
 
+def config_exists(profile: str, key: str) -> bool:
+    result = run(*hermes_args(profile, "config", "get", key), check=False)
+    value = result.stdout.strip().lower()
+    return result.returncode == 0 and value not in {"", "null", "none", "{}"}
+
+
 def digest(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
@@ -184,6 +190,10 @@ def configure_common(profile: dict[str, Any]) -> None:
             "gateway.platforms.telegram.enabled": False,
             "gateway.platforms.a2a.enabled": False,
             "mcp_servers.agent-factory.enabled": False,
+            "mcp_servers.agent-cards.enabled": False,
+            "mcp_servers.agentmail.enabled": False,
+            "mcp_servers.agentphone.enabled": False,
+            "mcp_servers.latitude.enabled": False,
         })
     for key, value in settings.items():
         config_set(profile_id, key, value)
@@ -216,6 +226,12 @@ def configure_default_gateway(root_home: Path, profiles: list[dict[str, Any]]) -
         root_home / "hermes-agent/venv/bin/python",
     )
     hermes_python = next((str(path) for path in python_candidates if path.is_file()), sys.executable)
+    new_servers = {
+        "agent-cards": not config_exists("default", "mcp_servers.agent-cards.url"),
+        "agentmail": not config_exists("default", "mcp_servers.agentmail.url"),
+        "agentphone": not config_exists("default", "mcp_servers.agentphone.command"),
+        "latitude": not config_exists("default", "mcp_servers.latitude.url"),
+    }
     settings: dict[str, Any] = {
         "gateway.multiplex_profiles": True,
         "gateway.multiplex_profile_allowlist": named,
@@ -240,7 +256,27 @@ def configure_default_gateway(root_home: Path, profiles: list[dict[str, Any]]) -
         },
         "mcp_servers.agent-factory.trust": "trusted",
         "mcp_servers.agent-factory.enabled": True,
+        "mcp_servers.agent-cards.url": "https://mcp.agentcard.sh/mcp",
+        "mcp_servers.agent-cards.auth": "oauth",
+        "mcp_servers.agent-cards.trust": "untrusted",
+        "mcp_servers.agent-cards.timeout": 120,
+        "mcp_servers.agentmail.url": "https://mcp.agentmail.to/mcp",
+        "mcp_servers.agentmail.headers.x-api-key": "${AGENTMAIL_API_KEY}",
+        "mcp_servers.agentmail.trust": "untrusted",
+        "mcp_servers.agentmail.timeout": 120,
+        "mcp_servers.agentphone.command": "npx",
+        "mcp_servers.agentphone.args": ["-y", "agentphone-mcp@0.7.0"],
+        "mcp_servers.agentphone.env.AGENTPHONE_API_KEY": "${AGENTPHONE_API_KEY}",
+        "mcp_servers.agentphone.trust": "untrusted",
+        "mcp_servers.agentphone.timeout": 120,
+        "mcp_servers.latitude.url": "https://api.latitude.so/v1/mcp",
+        "mcp_servers.latitude.auth": "oauth",
+        "mcp_servers.latitude.trust": "untrusted",
+        "mcp_servers.latitude.timeout": 180,
     }
+    for server, is_new in new_servers.items():
+        if is_new:
+            settings[f"mcp_servers.{server}.enabled"] = False
     for key, value in settings.items():
         config_set("default", key, value)
 
@@ -250,7 +286,8 @@ def ensure_named_profile(profile: dict[str, Any], root_home: Path) -> Path:
     if not PROFILE_NAME.fullmatch(profile_id):
         raise ValueError(f"invalid profile id: {profile_id}")
     profile_home = root_home / "profiles" / profile_id
-    if not profile_home.exists():
+    created = not profile_home.exists()
+    if created:
         result = run(
             "hermes",
             "profile",
@@ -263,7 +300,7 @@ def ensure_named_profile(profile: dict[str, Any], root_home: Path) -> Path:
         )
         if result.returncode:
             raise RuntimeError(f"could not create {profile_id}: {result.stderr.strip()}")
-    scrub_named_profile_env(profile_home)
+        scrub_named_profile_env(profile_home)
     return profile_home
 
 
@@ -290,10 +327,11 @@ def main() -> int:
     prior = load_manifest(manifest_path)
     current: dict[str, str] = {}
 
-    for source_name in ("org", "policies", "agent-templates", "services", "routines", "skills"):
+    for source_name in ("org", "policies", "agent-templates", "services", "routines", "skills", "stack", "fleet", "plugins"):
         sync_tree(root / source_name, state / "assets" / source_name, prior, current)
     sync_tree(root / "services", state / "services", prior, current)
     sync_tree(root / "company", state / "company", prior, current)
+    sync_tree(root / "plugins/latitude-observer", root_home / "plugins/latitude-observer", prior, current)
 
     selected: list[dict[str, Any]] = []
     if args.mode in ("cofounder", "all"):

@@ -5,6 +5,11 @@ Kanban, vision, image, computer-use, scheduling, and A2A capabilities. External
 business systems are attached only after the owner authorizes the specific
 account.
 
+Honcho memory, Agent Bundle identity, and Latitude visibility use the separate
+[`connect-agent-stack.sh`](../orgo/connect-agent-stack.sh) helper and the
+[managed stack guide](MANAGED-AGENT-STACK.md). Agent Bundle belongs to the
+Co-Founder; workers ask it to use the inbox, phone, or card over A2A.
+
 ## Calendar, inbox, Drive, CRM, and business apps
 
 `./orgo/connect-tools.sh` connects one selected profile to Composio. The default
