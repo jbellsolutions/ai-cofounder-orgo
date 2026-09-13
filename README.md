@@ -2,7 +2,7 @@
 
 <img src="docs/assets/ai-cofounder-hero-v1.png" alt="AI Co-Founder coordinating a leadership team across operations, revenue, affiliates, finance, research, and customers" width="1000"/>
 
-# AI Co-Founder for Orgo
+# AI Co-Founder for [Orgo](https://orgo.ai?r=aiguy)
 
 ### One clear leader. A coordinated AI team. More time to build the business.
 
