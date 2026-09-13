@@ -35,7 +35,7 @@ Update stable computers one at a time
 Final health and version report
 ```
 
-Orgo targets use the workspace-scoped Orgo API. DigitalOcean targets use an
+[Orgo](https://orgo.ai?r=aiguy) targets use the workspace-scoped [Orgo](https://orgo.ai?r=aiguy) API. DigitalOcean targets use an
 existing, named SSH configuration. Both run the same node-side update contract,
 so health checks and rollback behavior do not drift by host.
 
@@ -48,7 +48,7 @@ The setup AI makes a private copy of
 ~/.config/ai-guy/fleet.json
 ```
 
-It replaces the examples with verified Orgo computer IDs or SSH config names,
+It replaces the examples with verified [Orgo](https://orgo.ai?r=aiguy) computer IDs or SSH config names,
 the correct GitHub repository for each agent, and one canary. This private file
 contains routing information but no server password, API key, or agent secret.
 It is never committed.
@@ -115,7 +115,7 @@ gateway.
 - Stable promotion and rollback require a run-specific owner approval record.
 - Computers update sequentially; one failure stops the rollout.
 - Inventory cannot provide arbitrary commands or destination paths.
-- The updater does not create/delete computers, change Orgo plans, change
+- The updater does not create/delete computers, change [Orgo](https://orgo.ai?r=aiguy) plans, change
   billing, rotate credentials, or grant itself new permissions.
 
 ## Current proof boundary
@@ -123,5 +123,5 @@ gateway.
 This repository is the first managed release and the AI Co-Founder is its
 canary. A live rollout begins only after that computer exists, its private
 inventory entry is verified, and the owner explicitly asks to update it.
-Existing Orgo computers are never silently assumed to be the Co-Founder and
+Existing [Orgo](https://orgo.ai?r=aiguy) computers are never silently assumed to be the Co-Founder and
 are not modified by template creation.

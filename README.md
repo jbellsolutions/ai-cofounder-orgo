@@ -20,7 +20,7 @@ role, durable work queue, and safe way to collaborate.
 
 </div>
 
-> **Orgo partner offer:** By the way, if you use our Orgo link, you’ll get 25% off your first three months on a monthly plan or your first year on a yearly plan. Add-ons are not discounted.
+> **[Orgo](https://orgo.ai?r=aiguy) partner offer:** Get 25% off your first three months on a monthly plan or your first year on a yearly plan. Add-ons are not discounted.
 
 <div align="center">
 
@@ -105,28 +105,28 @@ all pass verification.
 ```
 
 The repository includes a machine-readable [`llms.txt`](llms.txt), an exact
-Orgo contract, hidden-input connection helpers, tests, and a definition of
+[Orgo](https://orgo.ai?r=aiguy) contract, hidden-input connection helpers, tests, and a definition of
 done so a new AI chat can begin without needing this conversation.
 
 ## What installs
 
 | Layer | Included |
 |---|---|
-| Private computer | Persistent Orgo Linux computer built on the maintained Hermes template |
+| Private computer | Persistent [Orgo](https://orgo.ai?r=aiguy) Linux computer built on the maintained Hermes template |
 | Executive | AI Co-Founder as the owner-facing default profile |
 | Leadership | Head of Ops, Revenue Partner, Affiliate Revenue Partner, Finance & Risk, and Research & Analysis |
 | Coordination | Hermes Bot Mode, durable Kanban tasks, profile descriptions, reviews, and handoffs |
 | A2A | One authenticated gateway with a separate Agent Card and route for every profile |
 | Agent Factory | Controlled proposals and activation from approved templates; no autonomous deletion or infrastructure spending |
 | Managed stack | Honcho memory for every profile, Agent Bundle company identity, and Latitude traces/evaluations |
-| Fleet updates | Canary-first Orgo and DigitalOcean releases with exact commits, health gates, and local rollback |
+| Fleet updates | Canary-first [Orgo](https://orgo.ai?r=aiguy) and DigitalOcean releases with exact commits, health gates, and local rollback |
 | Business tools | Guided Calendar, inbox, Drive, CRM, and app connection through Composio plus PandaDoc proposals |
 | Channels | Slack Agent view and Telegram, connected to the Co-Founder by default |
 | Safety | Role-specific toolsets, manual approvals, peer allowlists, anti-loop limits, audit logs, and an emergency stop |
 
 ## Two deployment shapes
 
-**Webinar / compact:** one Orgo computer runs the Co-Founder and all five named
+**Webinar / compact:** one [Orgo](https://orgo.ai?r=aiguy) computer runs the Co-Founder and all five named
 profiles through a single multiplexed gateway. This is the default walkthrough.
 
 **Production / funding edition:** keep the Co-Founder core separate, run the
@@ -140,7 +140,7 @@ separate computers. [Architecture details →](docs/ARCHITECTURE.md)
 
 ## Simple installation
 
-1. Create an Orgo computer named `ai-guy-cofounder` from
+1. Create an [Orgo](https://orgo.ai?r=aiguy) computer named `ai-guy-cofounder` from
    `system/hermes-agent@1.0.0`.
 2. Clone this repository and run `./orgo/setup.sh`.
 3. Connect the model with `hermes setup`.
@@ -172,7 +172,7 @@ The screen-by-screen version is [START-HERE.md](START-HERE.md).
 | [Telegram](docs/TELEGRAM-SETUP.md) | Bot token, owner allowlist, and direct-message test |
 | [Tools](docs/TOOLS.md) | Calendar, inbox, Drive, CRM, proposals, and safe first tests |
 | [Managed agent stack](docs/MANAGED-AGENT-STACK.md) | Honcho, Agent Bundle, Latitude, A2A, ownership, and privacy |
-| [Fleet updates](docs/FLEET-UPDATES.md) | One-request updates across Orgo and DigitalOcean with canary and rollback |
+| [Fleet updates](docs/FLEET-UPDATES.md) | One-request updates across [Orgo](https://orgo.ai?r=aiguy) and DigitalOcean with canary and rollback |
 | [Skills](docs/SKILLS.md) | Shared and role skills, updates, review, and safe installation |
 | [Operations](docs/OPERATIONS.md) | Daily brief, weekly business review, emergency stop, backup, and updates |
 | [Verification](docs/VERIFICATION.md) | Automated checks and live acceptance tests |
@@ -181,5 +181,5 @@ AI Co-Founder is an operating partner, not a legal officer, fiduciary, or
 signatory. It does not promise business outcomes. Connected services activate
 only after their real credentials and permissions are configured.
 
-MIT licensed. This project is not affiliated with Orgo, Nous Research, Slack,
+MIT licensed. This project is not affiliated with [Orgo](https://orgo.ai?r=aiguy), Nous Research, Slack,
 Telegram, Composio, PandaDoc, OpenRouter, or Tailscale.

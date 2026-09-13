@@ -50,11 +50,11 @@ Hermes profiles are not operating-system sandboxes. A profile separates Hermes
 state but does not by itself prevent the same OS user from reading another
 directory. This template removes terminal access from the profile toolsets and
 uses `terminal.home_mode: profile`, but materially incompatible secrets or
-filesystem trust should still be separated onto different Orgo computers.
+filesystem trust should still be separated onto different [Orgo](https://orgo.ai?r=aiguy) computers.
 
 ## Compact deployment
 
-The default setup runs on one Orgo computer:
+The default setup runs on one [Orgo](https://orgo.ai?r=aiguy) computer:
 
 ```text
 ai-guy-cofounder
@@ -68,7 +68,7 @@ ai-guy-cofounder
 
 One gateway owns Slack/Telegram, Kanban dispatch, Bot Mode, and port 9900. Each
 named profile has a multiplex route and A2A Agent Card. This shape is easiest
-to teach in a webinar and uses one Orgo computer slot.
+to teach in a webinar and uses one [Orgo](https://orgo.ai?r=aiguy) computer slot.
 
 ## Production funding deployment
 

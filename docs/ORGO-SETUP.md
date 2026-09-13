@@ -1,4 +1,4 @@
-# Orgo setup
+# [Orgo](https://orgo.ai?r=aiguy) setup
 
 This is the precise technical contract behind the plain-language
 [Start Here](../START-HERE.md) walkthrough.
@@ -16,10 +16,10 @@ The canonical values live in [`orgo/deployment.json`](../orgo/deployment.json):
 - A2A on private port 9900;
 - API server peer transport on private port 8377 when selected.
 
-Orgo Startup can launch the maintained Hermes template. A private custom
+[Orgo](https://orgo.ai?r=aiguy) Startup can launch the maintained Hermes template. A private custom
 golden-template build is unnecessary for this repository and may require a
 different plan. The reproducible overlay keeps the public GitHub template
-usable without an Orgo account change.
+usable without an [Orgo](https://orgo.ai?r=aiguy) account change.
 
 ## Deployment order
 
@@ -42,7 +42,7 @@ explain.
 
 ## No deployment from GitHub alone
 
-The repository contains no Orgo API key and performs no account mutation when
+The repository contains no [Orgo](https://orgo.ai?r=aiguy) API key and performs no account mutation when
 opened or cloned. A setup agent must inspect the authorized account, resolve the
 workspace, create or select the exact computer, and operate its terminal. This
 prevents a public repository from becoming an accidental billing action.

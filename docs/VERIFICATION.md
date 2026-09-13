@@ -1,6 +1,6 @@
 # Verification
 
-Verification has two layers: repository proof and live Orgo acceptance.
+Verification has two layers: repository proof and live [Orgo](https://orgo.ai?r=aiguy) acceptance.
 
 ## Repository proof
 

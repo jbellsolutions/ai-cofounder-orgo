@@ -1,4 +1,6 @@
-# Start here: AI Co-Founder on an Orgo computer
+# Start here: AI Co-Founder on an [Orgo](https://orgo.ai?r=aiguy) computer
+
+> **[Orgo](https://orgo.ai?r=aiguy) partner offer:** Get 25% off your first three months on a monthly plan or your first year on a yearly plan. Add-ons are not discounted.
 
 This walkthrough is written for someone creating a cloud computer for the
 first time. You do not need to know server commands. A setup agent should do
@@ -26,18 +28,18 @@ inbox, CRM, and PandaDoc if I authorize them. Finish only when a real message ge
 
 The setup agent quietly confirms:
 
-- the intended Orgo workspace and computer do not already exist;
+- the intended [Orgo](https://orgo.ai?r=aiguy) workspace and computer do not already exist;
 - the owner is ready to select a model provider;
 - the intended Slack workspace is available;
 - optional Telegram and business-app accounts are available if wanted;
-- no unrelated Orgo computer will be changed.
+- no unrelated [Orgo](https://orgo.ai?r=aiguy) computer will be changed.
 
-Private values go only into hidden prompts on the Orgo computer. They never go
+Private values go only into hidden prompts on the [Orgo](https://orgo.ai?r=aiguy) computer. They never go
 in GitHub, a webinar chat, a screenshot, a shared note, or an AI response.
 
 ## Step 1 — Create the computer
 
-In Orgo, open the intended customer workspace and create a computer from the
+In [Orgo](https://orgo.ai?r=aiguy), open the intended customer workspace and create a computer from the
 maintained template `system/hermes-agent@1.0.0`:
 
 - Name: `ai-guy-cofounder`
@@ -62,7 +64,7 @@ cd ai-cofounder-orgo
 This installs the reviewed Hermes v0.21.0 release and the AI Co-Founder
 identity, company constitution, policies, skills, controlled Agent Factory,
 Bot Mode configuration, Kanban foundation, and private A2A gateway. It does
-not create a paid Orgo computer, connect an account, send a message, or publish
+not create a paid [Orgo](https://orgo.ai?r=aiguy) computer, connect an account, send a message, or publish
 anything by itself.
 
 ## Step 3 — Connect the model privately

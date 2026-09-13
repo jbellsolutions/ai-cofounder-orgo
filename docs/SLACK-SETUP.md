@@ -18,11 +18,11 @@ Slack apps unless a later operating design calls for direct human access.
 
 The manifest enables Slack Agent view, Socket Mode, direct messages, mentions,
 thread continuation, files, reactions, and Hermes commands. Socket Mode means
-the Orgo computer makes an outbound connection; no public webhook is required.
+the [Orgo](https://orgo.ai?r=aiguy) computer makes an outbound connection; no public webhook is required.
 
 ## Connect privately
 
-On the Orgo computer run:
+On the [Orgo](https://orgo.ai?r=aiguy) computer run:
 
 ```bash
 ./orgo/connect-channels.sh

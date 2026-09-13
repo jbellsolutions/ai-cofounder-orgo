@@ -59,7 +59,7 @@ are preserved by the managed-seed manifest.
 
 ## Customer isolation
 
-Use a separate Orgo workspace or clear customer trust boundary. Do not share
+Use a separate [Orgo](https://orgo.ai?r=aiguy) workspace or clear customer trust boundary. Do not share
 customer credentials, memory, tasks, or company context across installations.
 A workspace payment plan is an account decision; it does not replace data and
 permission isolation inside the computers.

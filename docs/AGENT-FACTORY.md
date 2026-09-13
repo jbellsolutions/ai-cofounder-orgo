@@ -41,7 +41,7 @@ write tools, and its own A2A route after activation.
 ## Tools intentionally absent
 
 There is no factory tool to approve, delete a profile, delete data, create or
-resize an Orgo computer, change billing, grant a credential, change permission
+resize an [Orgo](https://orgo.ai?r=aiguy) computer, change billing, grant a credential, change permission
 or policy, trust a peer, or run an arbitrary command.
 
 Retirement remains an owner-operated process because Hermes profile deletion

@@ -1,13 +1,13 @@
-# Orgo reference used by this repository
+# [Orgo](https://orgo.ai?r=aiguy) reference used by this repository
 
 Last verified: August 31, 2026.
 
-The source of truth is Orgo's machine-readable documentation:
+The source of truth is [Orgo](https://orgo.ai?r=aiguy)'s machine-readable documentation:
 [https://docs.orgo.ai/llms.txt](https://docs.orgo.ai/llms.txt).
 
 ## Applied facts
 
-- An Orgo computer is persistent and belongs to a workspace.
+- An [Orgo](https://orgo.ai?r=aiguy) computer is persistent and belongs to a workspace.
 - A computer is created from a template and has explicit CPU, memory, disk, and
   display settings.
 - `system/hermes-agent@1.0.0` is the maintained Hermes template used here.
@@ -19,7 +19,7 @@ The source of truth is Orgo's machine-readable documentation:
 
 ## Setup-agent API discipline
 
-When using the Orgo API, the setup agent should:
+When using the [Orgo](https://orgo.ai?r=aiguy) API, the setup agent should:
 
 1. list workspaces and select the exact intended workspace;
 2. list computers in that workspace and match the exact name;
@@ -31,6 +31,6 @@ When using the Orgo API, the setup agent should:
 8. verify the resulting computer ID, name, workspace, template, and state.
 
 The public repository deliberately does not contain account-specific API
-requests or credentials. The live setup agent should fetch the current Orgo
+requests or credentials. The live setup agent should fetch the current [Orgo](https://orgo.ai?r=aiguy)
 schema from `llms.txt` before an account mutation because endpoints and plan
 capabilities can change after this release.
