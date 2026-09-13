@@ -1,5 +1,5 @@
 name: latitude-observer
-version: "1.0.0"
+version: "2026.09.13.1"
 description: "Opt-in Latitude traces for Hermes turns, model calls, tools, approvals, and delegated work; metadata-only or secret-redacted semantic capture."
 author: AI Guy
 requires_env:

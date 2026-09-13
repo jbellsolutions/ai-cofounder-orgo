@@ -1,0 +1,24 @@
+{
+  "id": "ai-cofounder",
+  "name": "AI Co-Founder",
+  "purpose": "Business strategy, decisions and coordination with separately scoped worker profiles.",
+  "runtime": "native",
+  "slack_manifests": [
+    "slack-manifest.json"
+  ],
+  "a2a_helper": "orgo/connect-a2a.sh",
+  "services": [
+    "honcho",
+    "latitude",
+    "agentphone",
+    "agentmail",
+    "composio",
+    "pandadoc",
+    "super-browser",
+    "scrapecreators",
+    "onepassword",
+    "a2a",
+    "agentcard"
+  ],
+  "team_helper": "orgo/create-team.sh"
+}

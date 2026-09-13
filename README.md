@@ -1,5 +1,7 @@
 <div align="center">
 
+**Supported self-install:** Give your setup AI this repository link and follow [Start here](START-HERE.md). The shared walkthrough offers resumable setup, optional Honcho, Latitude, dedicated phone/inbox and business connections. Default name: **AI Co-Founder**; existing custom names are preserved. [Setup and verification details](onboarding/GUIDE.md).
+
 <img src="docs/assets/ai-cofounder-hero-v1.png" alt="AI Co-Founder coordinating a leadership team across operations, revenue, affiliates, finance, research, and customers" width="1000"/>
 
 # AI Co-Founder for [Orgo](https://orgo.ai?r=aiguy)

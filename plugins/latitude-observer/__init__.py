@@ -17,6 +17,8 @@ import secrets
 import socket
 import threading
 import time
+from pathlib import Path
+import tempfile
 from typing import Any
 from urllib import error, parse, request
 
@@ -32,6 +34,18 @@ _REQUESTS: dict[str, "Span"] = {}
 _TOOLS: dict[str, "Span"] = {}
 _SUBAGENTS: dict[str, "Span"] = {}
 _EXPORTER: "Exporter | None | bool" = None
+_EXPORTERS: dict[str, "Exporter"] = {}
+_TRACE_EXPORTERS: dict[str, "Exporter"] = {}
+
+
+def _secret(name: str, default: str = "") -> str:
+    from gateway.platforms._shared import get_scoped_secret
+    return get_scoped_secret(name, default)
+
+
+class _NoRedirect(request.HTTPRedirectHandler):
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        return None
 
 
 def _now_ns() -> int:
@@ -39,7 +53,7 @@ def _now_ns() -> int:
 
 
 def _capture_mode() -> str:
-    mode = os.environ.get("LATITUDE_CAPTURE_MODE", "metadata").strip().lower()
+    mode = _secret("LATITUDE_CAPTURE_MODE", "metadata").strip().lower()
     return mode if mode in {"metadata", "sanitized"} else "metadata"
 
 
@@ -138,6 +152,10 @@ class Exporter:
         self.endpoint = endpoint
         self.api_key = api_key
         self.project = project
+        from hermes_constants import get_hermes_home
+        self.home = Path(get_hermes_home())
+        self.mode = _capture_mode()
+        self.service = _secret("LATITUDE_SERVICE_NAME", "orgo-agent")
         self.items: queue.Queue[dict[str, Any] | None] = queue.Queue(maxsize=MAX_QUEUE)
         self.stopping = threading.Event()
         self.worker = threading.Thread(target=self._run, name="latitude-observer", daemon=True)
@@ -150,7 +168,7 @@ class Exporter:
             logger.warning("Latitude observer queue full; dropping one span")
 
     def _run(self) -> None:
-        while not self.stopping.is_set():
+        while not self.stopping.is_set() or not self.items.empty():
             try:
                 first = self.items.get(timeout=0.5)
             except queue.Empty:
@@ -171,8 +189,8 @@ class Exporter:
 
     def _send(self, spans: list[dict[str, Any]]) -> None:
         resource = {
-            "service.name": os.environ.get("LATITUDE_SERVICE_NAME", "ai-guy-hermes"),
-            "service.version": os.environ.get("AI_GUY_STACK_VERSION", "2026.09.01.1"),
+            "service.name": self.service,
+            "service.version": os.environ.get("AI_GUY_STACK_VERSION", "2026.09.12.1"),
             "service.instance.id": _safe_id(socket.gethostname()),
             "deployment.environment": os.environ.get("AI_GUY_ENVIRONMENT", "production"),
         }
@@ -195,68 +213,97 @@ class Exporter:
         for attempt in range(3):
             try:
                 req = request.Request(self.endpoint, data=body, headers=headers, method="POST")
-                with request.urlopen(req, timeout=8) as response:
+                opener = request.build_opener(request.ProxyHandler({}), _NoRedirect())
+                with opener.open(req, timeout=8) as response:
                     if response.status == 202:
+                        self._receipt(spans)
                         return
                     if response.status < 500 and response.status != 429:
                         return
             except error.HTTPError as exc:
-                if exc.code < 500 and exc.code != 429:
+                code = exc.code
+                exc.close()
+                if code < 500 and code != 429:
                     return
             except Exception:
                 pass
             time.sleep(0.5 * (2**attempt))
 
+    def _receipt(self, spans):
+        roots = [span for span in spans if span.get("name") == "hermes.agent.turn"]
+        if not roots:
+            return
+        folder = self.home / ".orgo-onboarding"
+        folder.mkdir(mode=0o700, parents=True, exist_ok=True)
+        receipt = {"schema_version": 1, "accepted_at": int(time.time()),
+                   "trace_id": roots[-1]["traceId"], "mode": self.mode,
+                   "connection": hashlib.sha256((self.api_key + ":" + self.project).encode()).hexdigest()}
+        fd, path = tempfile.mkstemp(dir=folder, prefix=".latitude-")
+        try:
+            with os.fdopen(fd, "w") as stream:
+                os.fchmod(stream.fileno(), 0o600)
+                json.dump(receipt, stream)
+            os.replace(path, folder / "latitude-receipt.json")
+        finally:
+            Path(path).unlink(missing_ok=True)
+
     def close(self) -> None:
         self.stopping.set()
-        try:
-            self.items.put_nowait(None)
-        except queue.Full:
-            pass
         self.worker.join(timeout=4)
 
 
 def _endpoint() -> str | None:
-    value = os.environ.get("LATITUDE_OTLP_ENDPOINT", DEFAULT_ENDPOINT).strip()
-    parsed = parse.urlparse(value)
-    if parsed.scheme != "https" or not parsed.hostname:
-        logger.warning("Latitude observer rejected a non-HTTPS endpoint")
+    value = _secret("LATITUDE_OTLP_ENDPOINT", DEFAULT_ENDPOINT).strip()
+    if value != DEFAULT_ENDPOINT:
+        logger.warning("Latitude observer rejected an unreviewed export destination")
         return None
     return value
 
 
 def _exporter() -> Exporter | None:
-    global _EXPORTER
-    if _EXPORTER is False:
+    from hermes_constants import get_hermes_home
+    home = str(get_hermes_home())
+    api_key = _secret("LATITUDE_API_KEY").strip()
+    project = _secret("LATITUDE_PROJECT_SLUG").strip()
+    endpoint = _endpoint()
+    if not api_key or not project or not endpoint:
         return None
-    if isinstance(_EXPORTER, Exporter):
-        return _EXPORTER
     with _LOCK:
-        if isinstance(_EXPORTER, Exporter):
-            return _EXPORTER
-        api_key = os.environ.get("LATITUDE_API_KEY", "").strip()
-        project = os.environ.get("LATITUDE_PROJECT_SLUG", "").strip()
-        endpoint = _endpoint()
-        if not api_key or not project or not endpoint:
-            _EXPORTER = False
-            return None
-        _EXPORTER = Exporter(endpoint, api_key, project)
-        return _EXPORTER
+        previous = _EXPORTERS.get(home)
+        if previous and (previous.api_key, previous.project, previous.mode) == (api_key, project, _capture_mode()):
+            return previous
+        # Never reuse the default profile's exporter for a separately scoped
+        # profile, nor reuse an exporter after a private capture-mode change.
+        exporter = Exporter(endpoint, api_key, project)
+        _EXPORTERS[home] = exporter
+        if previous:
+            previous.stopping.set()
+        return exporter
 
 
 def _submit(span: dict[str, Any]) -> None:
-    exporter = _exporter()
+    exporter = _TRACE_EXPORTERS.get(span.get("traceId"))
     if exporter:
         exporter.submit(span)
+        if span.get("name") == "hermes.agent.turn":
+            _TRACE_EXPORTERS.pop(span.get("traceId"), None)
+
+
+def _scope_id(value: Any) -> str:
+    if not value:
+        return ""
+    from hermes_constants import get_hermes_home
+    return str(get_hermes_home()) + "::" + str(value)
 
 
 def _turn_key(kwargs: dict[str, Any]) -> str:
-    return str(kwargs.get("turn_id") or kwargs.get("task_id") or kwargs.get("session_id") or "")
+    return _scope_id(kwargs.get("turn_id") or kwargs.get("task_id") or kwargs.get("session_id"))
 
 
 def _get_or_create_turn(kwargs: dict[str, Any]) -> TurnState | None:
     key = _turn_key(kwargs)
-    if not key or _exporter() is None:
+    exporter = _exporter()
+    if not key or exporter is None:
         return None
     evicted: dict[str, Any] | None = None
     with _LOCK:
@@ -269,6 +316,7 @@ def _get_or_create_turn(kwargs: dict[str, Any]) -> TurnState | None:
             evicted = oldest.root.finish(status="error", extra={"ai.guy.stop_reason": "state_evicted"})
             _TURNS.pop(oldest.key, None)
         trace_id = secrets.token_hex(16)
+        _TRACE_EXPORTERS[trace_id] = exporter
         session_id = str(kwargs.get("session_id") or "")
         root = Span(
             trace_id=trace_id,
@@ -293,10 +341,14 @@ def _get_or_create_turn(kwargs: dict[str, Any]) -> TurnState | None:
     return state
 
 
-def _finish_turn(kwargs: dict[str, Any], status: str = "ok") -> None:
-    key = _turn_key(kwargs)
+def _finish_turn(kwargs: dict[str, Any], status: str = "ok", *, scoped_key=None) -> None:
+    key = scoped_key or _turn_key(kwargs)
     with _LOCK:
         state = _TURNS.pop(key, None)
+        if state:
+            for spans in (_REQUESTS, _TOOLS, _SUBAGENTS):
+                for span_key in [k for k, v in spans.items() if v.trace_id == state.root.trace_id]:
+                    spans.pop(span_key, None)
     if not state:
         return
     response = _content(kwargs.get("assistant_response"))
@@ -315,12 +367,18 @@ def on_pre_llm_call(**kwargs: Any) -> None:
 
 
 def on_post_llm_call(**kwargs: Any) -> None:
-    _finish_turn(kwargs)
+    # A model call can precede tools and another model call. The turn-final hook
+    # closes the root after the whole agent turn, preserving one coherent trace.
+    state = _get_or_create_turn(kwargs)
+    if state:
+        content = _content(kwargs.get("assistant_response"))
+        if content:
+            state.root.attributes["gen_ai.output.messages"] = content
 
 
 def on_pre_api_request(**kwargs: Any) -> None:
     state = _get_or_create_turn(kwargs)
-    request_id = str(kwargs.get("api_request_id") or "")
+    request_id = _scope_id(kwargs.get("api_request_id"))
     if not state or not request_id:
         return
     attributes: dict[str, Any] = {
@@ -354,7 +412,7 @@ def _usage_attrs(usage: Any) -> dict[str, Any]:
 
 
 def on_post_api_request(**kwargs: Any) -> None:
-    request_id = str(kwargs.get("api_request_id") or "")
+    request_id = _scope_id(kwargs.get("api_request_id"))
     with _LOCK:
         span = _REQUESTS.pop(request_id, None)
     if not span:
@@ -372,7 +430,7 @@ def on_post_api_request(**kwargs: Any) -> None:
 
 
 def on_api_request_error(**kwargs: Any) -> None:
-    request_id = str(kwargs.get("api_request_id") or "")
+    request_id = _scope_id(kwargs.get("api_request_id"))
     with _LOCK:
         span = _REQUESTS.pop(request_id, None)
     if not span:
@@ -386,7 +444,7 @@ def on_api_request_error(**kwargs: Any) -> None:
 
 def on_pre_tool_call(**kwargs: Any) -> None:
     state = _get_or_create_turn(kwargs)
-    call_id = str(kwargs.get("tool_call_id") or "")
+    call_id = _scope_id(kwargs.get("tool_call_id"))
     if not state or not call_id:
         return
     attributes: dict[str, Any] = {
@@ -409,7 +467,7 @@ def on_pre_tool_call(**kwargs: Any) -> None:
 
 
 def on_post_tool_call(**kwargs: Any) -> None:
-    call_id = str(kwargs.get("tool_call_id") or "")
+    call_id = _scope_id(kwargs.get("tool_call_id"))
     with _LOCK:
         span = _TOOLS.pop(call_id, None)
     if not span:
@@ -497,15 +555,14 @@ def on_session_end(**kwargs: Any) -> None:
 def on_session_finalize(**kwargs: Any) -> None:
     session_id = str(kwargs.get("session_id") or "")
     with _LOCK:
-        keys = [key for key, state in _TURNS.items() if not session_id or state.session_id == session_id]
+        keys = [key for key, state in _TURNS.items() if key.startswith(_scope_id("scope").rsplit("::", 1)[0] + "::") and (not session_id or state.session_id == session_id)]
     for key in keys:
-        _finish_turn({"turn_id": key}, status="error" if kwargs.get("reason") == "shutdown" else "ok")
+        _finish_turn({}, status="error" if kwargs.get("reason") == "shutdown" else "ok", scoped_key=key)
     if kwargs.get("reason") == "shutdown":
-        global _EXPORTER
-        exporter = _EXPORTER
-        if isinstance(exporter, Exporter):
+        from hermes_constants import get_hermes_home
+        exporter = _EXPORTERS.pop(str(get_hermes_home()), None)
+        if exporter:
             exporter.close()
-        _EXPORTER = False
 
 
 def register(ctx: Any) -> None:

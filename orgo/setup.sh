@@ -3,10 +3,16 @@
 set -euo pipefail
 
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+# The supported entrypoint is the resumable shared journey. Keep the role overlay
+# callable internally for upgrades and existing automation.
+if [ "${1:-}" != "--runtime-only" ]; then
+  exec bash "$REPO_DIR/orgo-onboard" setup "$@"
+fi
+shift
 HERMES_HOME="${HERMES_HOME:-$HOME/.hermes}"
-HERMES_TAG="v2026.8.31"
-HERMES_COMMIT="29112bef099274229cadff79cdff7bf7b99c4b77"
-INSTALLER_SHA256="85ef536d455e51ab67aa74d79272efd49fe717597dbaadfd3cca179a905f4706"
+HERMES_TAG="v2026.9.11"
+HERMES_COMMIT="939e45c91d751fadd94dcd1b873ac3cb44846213"
+INSTALLER_SHA256="5854b15670b51a8daae8f59ddfa917062de9f74be261eb73b4b8d719710f8968"
 
 say() { printf '\n%s\n' "$*"; }
 fail() { printf '\nSetup stopped: %s\n' "$*" >&2; exit 1; }
@@ -38,7 +44,7 @@ for candidate in /usr/local/lib/hermes-agent "$HERMES_HOME/hermes-agent"; do
 done
 
 if [ "$installed_commit" != "$HERMES_COMMIT" ]; then
-  say "2 of 5 — Installing the reviewed Hermes v0.21.0 release"
+  say "2 of 5 — Installing the reviewed Hermes v0.21.2 release"
   installer="$(mktemp)"
   trap 'rm -f "${installer:-}"' EXIT
   curl -fsSL "https://raw.githubusercontent.com/NousResearch/hermes-agent/$HERMES_COMMIT/scripts/install.sh" -o "$installer"
@@ -57,8 +63,8 @@ python3 "$REPO_DIR/services/install_profiles.py" \
   --root "$REPO_DIR" --home "$HERMES_HOME" --mode cofounder
 
 say "4 of 5 — Locking the human-facing channels until the owner connects them"
-hermes config set gateway.platforms.slack.enabled false >/dev/null
-hermes config set gateway.platforms.telegram.enabled false >/dev/null
+# The profile installer applies closed channel defaults on new homes. Upgrades
+# preserve existing owner-authorized Slack and Telegram connections.
 mkdir -p "$HOME/Desktop"
 
 say "5 of 5 — Verifying the core"

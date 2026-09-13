@@ -30,10 +30,10 @@ def load(relative: str):
 class RepositoryContractTests(unittest.TestCase):
     def test_release_is_pinned_to_reviewed_hermes_version(self):
         deployment = load("orgo/deployment.json")
-        self.assertEqual("v2026.8.31", deployment["runtime"]["hermes_release"])
-        self.assertEqual("0.21.0", deployment["runtime"]["hermes_version"])
-        self.assertEqual("29112bef099274229cadff79cdff7bf7b99c4b77", deployment["runtime"]["hermes_commit"])
-        self.assertEqual("85ef536d455e51ab67aa74d79272efd49fe717597dbaadfd3cca179a905f4706", deployment["runtime"]["install_script_sha256"])
+        self.assertEqual("v2026.9.11", deployment["runtime"]["hermes_release"])
+        self.assertEqual("0.21.2", deployment["runtime"]["hermes_version"])
+        self.assertEqual("939e45c91d751fadd94dcd1b873ac3cb44846213", deployment["runtime"]["hermes_commit"])
+        self.assertEqual("5854b15670b51a8daae8f59ddfa917062de9f74be261eb73b4b8d719710f8968", deployment["runtime"]["install_script_sha256"])
         setup = (ROOT / "orgo/setup.sh").read_text()
         self.assertIn(deployment["runtime"]["hermes_commit"], setup)
         self.assertIn(deployment["runtime"]["install_script_sha256"], setup)
@@ -247,11 +247,12 @@ class RepositoryContractTests(unittest.TestCase):
 
     def test_managed_stack_versions_scopes_and_privacy_are_explicit(self):
         manifest = load("stack/manifest.json")
-        self.assertEqual("2026.09.01.1", manifest["stack_version"])
-        bundle = manifest["components"]["agent_bundle"]
-        self.assertEqual("0.2.2", bundle["version"])
-        self.assertEqual("default-profile-only-mediated-to-team-over-a2a", bundle["scope"])
-        self.assertFalse(bundle["production_cards_default"])
+        self.assertEqual("2026.09.13.1", manifest["stack_version"])
+        self.assertNotIn("agent_bundle", manifest["components"])
+        for service in ("agentphone", "agentmail", "agentcard"):
+            self.assertEqual("disabled", manifest["components"][service]["default"])
+        self.assertEqual("TEST", manifest["components"]["agentcard"]["initial_mode"])
+        self.assertFalse(manifest["components"]["agentcard"]["spending_enabled"])
         latitude = manifest["components"]["latitude"]
         self.assertEqual("metadata", latitude["default_capture_mode"])
         self.assertEqual("sanitized", latitude["semantic_capture_mode"])
@@ -286,6 +287,8 @@ class RepositoryContractTests(unittest.TestCase):
             self.assertNotIn("mail-fixture", result.stdout + result.stderr)
             self.assertNotIn("phone-fixture", result.stdout + result.stderr)
             self.assertEqual(0o600, (home / ".env").stat().st_mode & 0o777)
+            self.assertIn("credential-staged-not-activated", result.stdout)
+            self.assertNotIn("configured-test-mode", result.stdout)
 
     def test_latitude_observer_defaults_to_metadata_and_registers_every_hook(self):
         path = ROOT / "plugins/latitude-observer/__init__.py"
@@ -294,6 +297,7 @@ class RepositoryContractTests(unittest.TestCase):
         module = importlib.util.module_from_spec(spec)
         sys.modules[spec.name] = module
         spec.loader.exec_module(module)
+        module._secret = lambda key, default="": os.environ.get(key, default)  # standalone privacy test; shared suite checks actual Hermes secret scopes
         with mock.patch.dict(os.environ, {"LATITUDE_CAPTURE_MODE": "metadata"}, clear=False):
             self.assertIsNone(module._content({"private": "fixture"}))
         with (
