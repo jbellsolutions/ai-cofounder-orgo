@@ -20,6 +20,8 @@ role, durable work queue, and safe way to collaborate.
 
 </div>
 
+> **Orgo partner offer:** By the way, if you use our Orgo link, you’ll get 25% off your first three months on a monthly plan or your first year on a yearly plan. Add-ons are not discounted.
+
 <div align="center">
 
 [![CI](https://github.com/jbellsolutions/ai-cofounder-orgo/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/jbellsolutions/ai-cofounder-orgo/actions/workflows/ci.yml)
