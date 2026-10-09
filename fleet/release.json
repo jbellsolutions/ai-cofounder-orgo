@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "stack_version": "2026.09.01.1",
+  "stack_version": "2026.09.13.1",
   "release_channel": "stable",
   "managed_repository": "https://github.com/jbellsolutions/ai-cofounder-orgo.git",
   "managed_ref": "refs/heads/main",
@@ -23,8 +23,10 @@
     "cofounder-and-leadership-profiles",
     "a2a-routes-and-policy",
     "honcho-provider-support",
-    "agent-bundle-definitions",
+    "independent-optional-connections",
     "latitude-observer-and-mcp-definition",
     "fleet-update-contract"
-  ]
+  ],
+  "onboarding_version": "2026.09.13.1",
+  "promotion_prerequisite": "Revenue Partner test Orgo canary, then native and Docker acceptance"
 }

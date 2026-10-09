@@ -15,7 +15,7 @@ done
 
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 HERMES_HOME="${HERMES_HOME:-$HOME/.hermes}"
-EXPECTED_COMMIT="29112bef099274229cadff79cdff7bf7b99c4b77"
+EXPECTED_COMMIT="939e45c91d751fadd94dcd1b873ac3cb44846213"
 
 python3 -m json.tool "$REPO_DIR/orgo/deployment.json" >/dev/null
 python3 -m json.tool "$REPO_DIR/org/registry.json" >/dev/null

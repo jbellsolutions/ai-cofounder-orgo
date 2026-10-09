@@ -196,6 +196,8 @@ def configure_common(profile: dict[str, Any]) -> None:
             "mcp_servers.latitude.enabled": False,
         })
     for key, value in settings.items():
+        if profile_id != "default" and key.startswith("mcp_servers.") and config_exists(profile_id, key):
+            continue  # preserve an independently authorized connection; creation never inherits keys
         config_set(profile_id, key, value)
 
 
@@ -229,7 +231,7 @@ def configure_default_gateway(root_home: Path, profiles: list[dict[str, Any]]) -
     new_servers = {
         "agent-cards": not config_exists("default", "mcp_servers.agent-cards.url"),
         "agentmail": not config_exists("default", "mcp_servers.agentmail.url"),
-        "agentphone": not config_exists("default", "mcp_servers.agentphone.command"),
+        "agentphone": not (config_exists("default", "mcp_servers.agentphone.url") or config_exists("default", "mcp_servers.agentphone.command")),
         "latitude": not config_exists("default", "mcp_servers.latitude.url"),
     }
     settings: dict[str, Any] = {
@@ -264,9 +266,8 @@ def configure_default_gateway(root_home: Path, profiles: list[dict[str, Any]]) -
         "mcp_servers.agentmail.headers.x-api-key": "${AGENTMAIL_API_KEY}",
         "mcp_servers.agentmail.trust": "untrusted",
         "mcp_servers.agentmail.timeout": 120,
-        "mcp_servers.agentphone.command": "npx",
-        "mcp_servers.agentphone.args": ["-y", "agentphone-mcp@0.7.0"],
-        "mcp_servers.agentphone.env.AGENTPHONE_API_KEY": "${AGENTPHONE_API_KEY}",
+        "mcp_servers.agentphone.url": "https://mcp.agentphone.ai/mcp",
+        "mcp_servers.agentphone.headers.Authorization": "Bearer ${AGENTPHONE_API_KEY}",
         "mcp_servers.agentphone.trust": "untrusted",
         "mcp_servers.agentphone.timeout": 120,
         "mcp_servers.latitude.url": "https://api.latitude.so/v1/mcp",

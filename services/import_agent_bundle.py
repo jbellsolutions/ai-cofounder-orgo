@@ -86,13 +86,10 @@ def main() -> int:
         "AGENTMAIL_API_KEY": mail,
         "AGENTPHONE_API_KEY": phone,
     })
-    config_set("mcp_servers.agent-cards.enabled", True)
-    config_set("mcp_servers.agentmail.enabled", True)
-    config_set("mcp_servers.agentphone.enabled", True)
     print(json.dumps({
-        "agent_cards": "configured-test-mode",
-        "agentmail": "configured",
-        "agentphone": "configured",
+        "agent_cards": "requires-separate-test-key-selection",
+        "agentmail": "credential-staged-not-activated",
+        "agentphone": "credential-staged-not-activated",
         "credentials_printed": False,
     }, sort_keys=True))
     return 0
