@@ -97,8 +97,8 @@ This creates five isolated Hermes profiles:
 
 They inherit the working model connection at creation time, then receive their
 own identity, skills, role-specific tools, memory, sessions, and configuration.
-The installer enables one multiplexed gateway, separate A2A routes, and one
-durable Kanban board. It never copies future Slack, Telegram, or business-app
+The installer enables one multiplexed gateway under supervisord, separate A2A
+routes, and one durable Kanban board. It never copies future Slack, Telegram, or business-app
 tokens into the worker profiles.
 
 When the team first answers, tell the Co-Founder:

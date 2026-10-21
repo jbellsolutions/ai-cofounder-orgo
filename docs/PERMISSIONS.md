@@ -53,8 +53,35 @@ chains.
 
 Agents cannot disclose credentials, fabricate approval, expand their own
 permissions, bypass policy, alter or delete the audit record, disable security,
-trust an unknown peer, delete profiles, delete infrastructure, or access a
-factory arbitrary-command surface.
+trust an unknown peer, delete profiles, delete infrastructure, access a
+factory arbitrary-command surface, or stop, restart, or signal their own
+gateway.
+
+## Gateway restarts
+
+Every conversation runs through the gateway. An agent that restarts it takes
+the whole team offline, and a restart started from inside the gateway does not
+finish, because the gateway's shutdown kills it before the replacement starts.
+`gateway.self_restart` is a permanent denial, and these controls enforce it:
+
+- The `gateway-guard` plugin is installed and enabled in every profile home,
+  because Hermes loads plugins per profile. Its `pre_tool_call` hook blocks
+  terminal, code, process, and MCP calls that would stop, restart, or signal
+  the gateway or supervisord. It also blocks calls that reference
+  `_HERMES_GATEWAY`, run `hermes update` or this repository's lifecycle
+  scripts, or edit the guard, the plugin list, or `/etc/supervisor`.
+- The gateway runs with `--external-supervisor`. That also turns on Hermes's
+  own check in the gateway's terminal tool, which refuses
+  `hermes gateway stop|restart` while the gateway is supervised.
+- `services/gateway_service.py` refuses to restart, start, or pause the
+  gateway when a gateway process calls it.
+- Agent Factory activation does not restart the gateway. The owner sends
+  `/restart` to load a new profile.
+
+Only the owner restarts the gateway, with `/restart` or with
+`supervisorctl restart cofounder-gateway` from a shell outside it. Running
+`hermes gateway restart` from a shell fights the supervisor; see
+[Operations](OPERATIONS.md#the-gateway).
 
 ## Verification and logging
 

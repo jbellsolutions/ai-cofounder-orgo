@@ -37,7 +37,7 @@ code = 0
 if command == "status":
     print(f"{name}   {program['state']}   pid 4242, uptime 0:00:05" if program else f"{name}: ERROR (no such process)")
 elif command == "pid":
-    print(4242 if program and program["state"] == "RUNNING" else 0)
+    print(4999999 if program and program["state"] == "RUNNING" else 0)
 elif command == "reread":
     print("No config updates to processes")
 elif command == "update":

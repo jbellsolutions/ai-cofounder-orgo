@@ -46,6 +46,21 @@ The Agent Factory exposes no delete, infrastructure, billing, credential,
 permission-expansion, or arbitrary-command tool. Persistent profile activation
 must match an approved template and approval policy.
 
+## Gateway availability
+
+The gateway runs as the supervisord program `cofounder-gateway`. supervisord
+restarts it after any exit except Hermes's fatal-configuration code. Agents
+never stop, restart, or signal their own gateway. In every profile the
+`gateway-guard` plugin blocks those tool calls, along with attempts to disable
+or edit the guard or the supervisor configuration. The owner restarts the
+gateway with `/restart` or with `supervisorctl restart cofounder-gateway` from
+a shell. Running `hermes gateway restart` from a shell fights the supervisor:
+it races supervisord to start a second, unsupervised gateway in that shell. The
+emergency stop goes through supervisorctl and stays in force across a reboot.
+
+The guard matches command text, so it is a strong default, not a sandbox. A
+role that needs arbitrary shell access is still trusted code on its computer.
+
 ## A2A
 
 A2A defaults to localhost until a bearer token and wider bind are both set.

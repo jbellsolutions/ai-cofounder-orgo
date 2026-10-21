@@ -66,8 +66,10 @@ ai-guy-cofounder
 └── research-analysis            named profile
 ```
 
-One gateway owns Slack/Telegram, Kanban dispatch, Bot Mode, and port 9900. Each
-named profile has a multiplex route and A2A Agent Card. This shape is easiest
+One gateway owns Slack/Telegram, Kanban dispatch, Bot Mode, and port 9900. It
+runs as the supervisord program `cofounder-gateway`, which restarts it after
+any exit; only the owner restarts it on purpose. Each named profile has a
+multiplex route and A2A Agent Card. This shape is easiest
 to teach in a webinar and uses one [Orgo](https://orgo.ai?r=aiguy) computer slot.
 
 ## Production funding deployment
@@ -101,8 +103,9 @@ and the global stop controls used by this template.
 - Kanban caps concurrent work at three tasks and one task per profile.
 - Repeated tool failures hard-stop instead of merely warning.
 - Tasks use durable state and idempotency keys instead of chat replay.
-- `orgo/emergency-stop.sh` stops every gateway and disables Kanban dispatch
-  without deleting profiles, work, logs, or approvals.
+- `orgo/emergency-stop.sh` stops every gateway through supervisorctl, keeps it
+  stopped across a reboot, and disables Kanban dispatch without deleting
+  profiles, work, logs, or approvals.
 - `orgo/resume-team.sh` restores dispatch only after the owner resolves the
   stop reason.
 

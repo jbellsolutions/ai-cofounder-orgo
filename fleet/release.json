@@ -25,6 +25,7 @@
     "honcho-provider-support",
     "agent-bundle-definitions",
     "latitude-observer-and-mcp-definition",
+    "gateway-guard-and-supervised-gateway",
     "fleet-update-contract"
   ]
 }

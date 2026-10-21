@@ -26,6 +26,40 @@ prompt.
 - Review A2A peers, unusual traffic, loop stops, and audit entries.
 - Refresh company priorities and archive completed work without deleting audit.
 
+## The gateway
+
+One Hermes gateway serves every profile. It runs as the supervisord program
+`cofounder-gateway`, which `./orgo/create-team.sh` installs at
+`/etc/supervisor/conf.d/cofounder-gateway.conf`. supervisord restarts the
+gateway after any exit, including a clean exit with code 0 or 1. The one
+exception is code 78, Hermes's fatal-configuration exit, which needs a fix
+rather than a retry.
+
+The agent never restarts its own gateway. A restart started from inside the
+gateway is killed by the gateway's own shutdown before it can start the
+replacement, and that left a co-founder silent for 33 minutes on 2026-10-21.
+The `gateway-guard` plugin blocks those tool calls in every profile. When a
+change needs a restart, the Co-Founder asks the owner for one.
+
+The owner restarts the gateway by sending `/restart` in Slack or Telegram, or
+from a shell on the computer:
+
+```bash
+supervisorctl status cofounder-gateway
+supervisorctl restart cofounder-gateway
+```
+
+Do not run `hermes gateway restart` or `hermes gateway stop` from a shell. On
+an Orgo computer Hermes cannot see supervisord, so it fights the supervisor.
+`stop` kills the supervised process, and supervisord starts it again.
+`restart` stops it the same way, then tries to start a second gateway in the
+foreground of your shell, racing supervisord's restart for the profile lock.
+If the shell's copy wins, supervisord retries until the program is FATAL, and
+the gateway dies when the shell closes. The `./orgo/connect-*.sh` scripts
+already restart the gateway through supervisorctl.
+
+Logs are in `/var/log/cofounder-gateway.log` and `~/.hermes/logs/gateway.log`.
+
 ## Emergency stop
 
 From Slack use `/stop` for the active turn. For the whole team run:
@@ -34,8 +68,11 @@ From Slack use `/stop` for the active turn. For the whole team run:
 ./orgo/emergency-stop.sh
 ```
 
-This stops every gateway and disables Kanban dispatch. It preserves profiles,
-tasks, logs, approvals, and data for investigation. After resolving the cause:
+This stops the supervised gateway through supervisorctl, stops any other
+gateway on the computer, and disables Kanban dispatch. The stop holds across a
+reboot: the program's `autostart` stays off until you resume, and the connect
+scripts will not start it either. It preserves profiles, tasks, logs,
+approvals, and data for investigation. After resolving the cause:
 
 ```bash
 ./orgo/resume-team.sh
