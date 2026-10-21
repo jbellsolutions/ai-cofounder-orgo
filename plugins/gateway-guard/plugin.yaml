@@ -1,0 +1,6 @@
+name: gateway-guard
+version: "1.0.0"
+description: "Blocks the agent from stopping, restarting or signalling its own gateway, from touching _HERMES_GATEWAY, and from disabling this guard or editing the supervisor config. The gateway runs under supervisord as cofounder-gateway; only the owner restarts it."
+author: AI Guy
+hooks:
+  - pre_tool_call
