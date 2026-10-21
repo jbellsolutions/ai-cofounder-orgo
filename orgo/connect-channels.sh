@@ -2,6 +2,7 @@
 # Guided Slack and Telegram connection for the owner-facing Co-Founder profile.
 set -euo pipefail
 
+REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 HERMES_HOME="${HERMES_HOME:-$HOME/.hermes}"
 ENV_FILE="$HERMES_HOME/.env"
 mkdir -p "$HERMES_HOME"
@@ -57,6 +58,5 @@ case "$choice" in
   *) fail "choose 1 or 2" ;;
 esac
 
-hermes gateway install >/dev/null
-hermes gateway restart >/dev/null 2>&1 || hermes gateway start >/dev/null
+python3 "$REPO_DIR/services/gateway_service.py" restart
 echo "The channel is connected. Send hello, then verify the reply."

@@ -41,6 +41,7 @@ command -v hermes >/dev/null 2>&1 || { echo "Hermes is not installed." >&2; exit
 [ -f "$HERMES_HOME/cofounder/assets/policies/permissions.json" ]
 [ -f "$HERMES_HOME/cofounder/services/agent_factory_mcp.py" ]
 [ -f "$HERMES_HOME/plugins/latitude-observer/plugin.yaml" ]
+[ -f "$HERMES_HOME/plugins/gateway-guard/plugin.yaml" ]
 
 installed=""
 for candidate in /usr/local/lib/hermes-agent "$HERMES_HOME/hermes-agent"; do
@@ -57,10 +58,21 @@ hermes config get kanban.orchestrator_profile 2>/dev/null | grep -q default
 hermes config get approvals.mode 2>/dev/null | grep -q manual
 hermes config get tool_loop_guardrails.hard_stop_enabled 2>/dev/null | grep -qi true
 
+# Plugins are opt-in per profile home on the reviewed Hermes release.
+guard_enabled() {
+  local enabled disabled
+  enabled="$("$@" config get plugins.enabled 2>/dev/null || true)"
+  disabled="$("$@" config get plugins.disabled 2>/dev/null || true)"
+  printf '%s' "$enabled" | grep -q gateway-guard && ! printf '%s' "$disabled" | grep -q gateway-guard
+}
+guard_enabled hermes || { echo "gateway-guard is not enabled for the Co-Founder." >&2; exit 1; }
+
 if [ "$CORE_ONLY" = false ]; then
   for profile in head-of-ops revenue-partner affiliate-revenue-partner finance-risk research-analysis; do
     [ -f "$HERMES_HOME/profiles/$profile/SOUL.md" ]
     [ -d "$HERMES_HOME/profiles/$profile/skills/shared/a2a-collaboration" ]
+    [ -f "$HERMES_HOME/profiles/$profile/plugins/gateway-guard/plugin.yaml" ]
+    guard_enabled hermes -p "$profile" || { echo "gateway-guard is not enabled for $profile." >&2; exit 1; }
     hermes -p "$profile" config get platform_toolsets.cli 2>/dev/null | grep -q a2a
     hermes -p "$profile" config get platform_toolsets.a2a 2>/dev/null | grep -q kanban
     if hermes -p "$profile" config get platform_toolsets.a2a 2>/dev/null | grep -q 'a2a'; then
@@ -71,6 +83,12 @@ if [ "$CORE_ONLY" = false ]; then
   hermes config get gateway.multiplex_profile_allowlist 2>/dev/null | grep -q research-analysis
   hermes config get gateway.platforms.a2a.extra.agents 2>/dev/null | grep -q affiliate-revenue-partner
   hermes kanban stats >/dev/null
+  # The gateway is a supervisord program that restarts after any exit.
+  if [ "$ALLOW_UNCONNECTED" = false ]; then
+    python3 "$REPO_DIR/services/gateway_service.py" check --running
+  else
+    python3 "$REPO_DIR/services/gateway_service.py" check
+  fi
 fi
 
 if [ "$ALLOW_UNCONNECTED" = false ]; then

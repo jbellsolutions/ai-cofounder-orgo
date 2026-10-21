@@ -2,6 +2,7 @@
 # Connect business tools to one explicitly selected profile.
 set -euo pipefail
 
+REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 PROFILE="default"
 if [ "${1:-}" = "--profile" ]; then
   PROFILE="${2:-}"
@@ -75,4 +76,4 @@ case "$choice" in
   *) echo "Choose 1, 2, or 3." >&2; exit 1 ;;
 esac
 
-hermes gateway restart >/dev/null 2>&1 || true
+python3 "$REPO_DIR/services/gateway_service.py" restart

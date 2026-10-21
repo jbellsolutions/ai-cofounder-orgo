@@ -16,6 +16,7 @@ from typing import Any
 
 
 PROFILE_NAME = re.compile(r"^[a-z0-9][a-z0-9-]{0,62}$")
+GUARD_PLUGIN = "gateway-guard"
 MODEL_SECRET_KEYS = {
     "AI_GATEWAY_API_KEY",
     "ANTHROPIC_API_KEY",
@@ -158,6 +159,8 @@ def install_profile_files(
     sync_tree(root / "skills/shared", profile_home / "skills/shared", prior, current)
     role_name = profile["role_skill"].split("/")[-1]
     sync_tree(root / "skills/roles" / role_name, profile_home / "skills/roles" / role_name, prior, current)
+    # Hermes loads plugins per profile home, so every role gets its own guard.
+    sync_tree(root / "plugins" / GUARD_PLUGIN, profile_home / "plugins" / GUARD_PLUGIN, prior, current)
     profile_home.chmod(0o700)
     target_soul.chmod(0o600)
     (profile_home / ".ai-cofounder-role").write_text(profile["id"] + "\n")
@@ -197,6 +200,11 @@ def configure_common(profile: dict[str, Any]) -> None:
         })
     for key, value in settings.items():
         config_set(profile_id, key, value)
+    # Opt-in on Hermes v2026.8.31: a plugin loads only when plugins.enabled
+    # names it. --no-allow-tool-override skips the interactive consent prompt.
+    result = run(*hermes_args(profile_id, "plugins", "enable", GUARD_PLUGIN, "--no-allow-tool-override"), check=False)
+    if result.returncode:
+        raise RuntimeError(f"could not enable {GUARD_PLUGIN} for {profile_id}: {result.stderr.strip()}")
 
 
 def served_agents(profiles: list[dict[str, Any]]) -> dict[str, Any]:
@@ -332,6 +340,7 @@ def main() -> int:
     sync_tree(root / "services", state / "services", prior, current)
     sync_tree(root / "company", state / "company", prior, current)
     sync_tree(root / "plugins/latitude-observer", root_home / "plugins/latitude-observer", prior, current)
+    sync_tree(root / "plugins" / GUARD_PLUGIN, root_home / "plugins" / GUARD_PLUGIN, prior, current)
 
     selected: list[dict[str, Any]] = []
     if args.mode in ("cofounder", "all"):

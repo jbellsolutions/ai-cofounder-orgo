@@ -82,7 +82,8 @@
     "agent_identity.payment_method_change",
     "observability.key_manage",
     "fleet.inventory_delete",
-    "fleet.skip_canary"
+    "fleet.skip_canary",
+    "gateway.self_restart"
   ],
   "approval_record_required": [
     "request_id",

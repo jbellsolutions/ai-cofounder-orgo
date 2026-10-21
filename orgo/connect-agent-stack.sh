@@ -119,7 +119,7 @@ case "$choice" in
   *) echo "Choose 1, 2, 3, 4, or 5." >&2; exit 1 ;;
 esac
 
-hermes gateway restart >/dev/null 2>&1 || true
+python3 "$REPO_DIR/services/gateway_service.py" restart
 echo
 echo "Stack connection complete. No credential values were printed."
 show_status

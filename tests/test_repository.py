@@ -98,6 +98,7 @@ class RepositoryContractTests(unittest.TestCase):
             "infrastructure.delete",
             "agent_identity.payment_method_change",
             "fleet.skip_canary",
+            "gateway.self_restart",
         ):
             self.assertIn(action, policy["always_deny_to_agents"])
 
@@ -215,14 +216,19 @@ class RepositoryContractTests(unittest.TestCase):
             self.assertTrue((hermes_home / "cofounder/company/01-CONSTITUTION.md").is_file())
             self.assertTrue((hermes_home / "cofounder/services/agent_factory_mcp.py").is_file())
             self.assertTrue((hermes_home / "plugins/latitude-observer/plugin.yaml").is_file())
+            self.assertTrue((hermes_home / "plugins/gateway-guard/__init__.py").is_file())
+            command_log = log.read_text()
+            self.assertIn("\nplugins enable gateway-guard --no-allow-tool-override\n", "\n" + command_log)
             for profile in EXPECTED_PROFILES - {"default"}:
                 profile_home = hermes_home / "profiles" / profile
                 self.assertTrue((profile_home / "SOUL.md").is_file(), profile)
+                # Hermes loads plugins from each profile's own home.
+                self.assertTrue((profile_home / "plugins/gateway-guard/__init__.py").is_file(), profile)
+                self.assertIn(f"-p {profile} plugins enable gateway-guard --no-allow-tool-override", command_log)
                 self.assertTrue((profile_home / "skills/shared/a2a-collaboration/SKILL.md").is_file(), profile)
                 profile_env = (profile_home / ".env").read_text()
                 self.assertIn("OPENROUTER_API_KEY", profile_env)
                 self.assertNotIn("SLACK_BOT_TOKEN", profile_env)
-            command_log = log.read_text()
             self.assertIn("gateway.platforms.a2a.enabled false", command_log)
             self.assertIn("mcp_servers.agent-factory.enabled false", command_log)
             self.assertIn("mcp_servers.agent-cards.enabled false", command_log)
