@@ -139,6 +139,16 @@ def hermes_binary(home: Path) -> str:
     raise GatewayServiceError("Hermes is not installed; run ./orgo/setup.sh first")
 
 
+def require_external_supervisor_flag(hermes: str) -> None:
+    """Fail before touching the program file if this Hermes predates the flag."""
+    result = subprocess.run([hermes, "gateway", "run", "--help"], text=True, capture_output=True)
+    if "--external-supervisor" not in result.stdout + result.stderr:
+        raise GatewayServiceError(
+            f"{hermes} does not support `gateway run --external-supervisor`; "
+            "install the reviewed Hermes release with ./orgo/setup.sh first"
+        )
+
+
 def service_path(hermes: str, home: Path) -> str:
     entries = [str(Path(hermes).parent), str(home / ".local/bin")]
     node = shutil.which("node")
@@ -289,6 +299,7 @@ def install(restart: bool = False, reapply: bool = False) -> str:
     root = hermes_home()
     home = Path(os.environ.get("HOME") or pwd.getpwuid(os.getuid()).pw_dir)
     hermes = hermes_binary(root)
+    require_external_supervisor_flag(hermes)
     autostart = configured_autostart() is not False
     text = render(
         hermes=hermes,

@@ -69,7 +69,12 @@ class SupervisedFixture:
         self.log.write_text("")
         self._tool("supervisorctl", f"#!{sys.executable}\n{FAKE_SUPERVISORCTL}")
         self._tool("sudo", '#!/bin/sh\nexec "$@"\n')
-        self._tool("hermes", '#!/bin/sh\nprintf "hermes %s\\n" "$*" >> "$FAKE_LOG"\n')
+        self._tool("hermes", (
+            '#!/bin/sh\n'
+            'printf "hermes %s\\n" "$*" >> "$FAKE_LOG"\n'
+            '[ "$*" = "gateway run --help" ] && echo "  --external-supervisor  Declare an external process manager"\n'
+            'exit 0\n'
+        ))
         inherited = {
             key: value for key, value in os.environ.items()
             if key not in {"_HERMES_GATEWAY", "SUPERVISOR_PROCESS_NAME", "HERMES_HOME"}
@@ -196,6 +201,15 @@ class GatewayServiceTests(unittest.TestCase):
         # A stop still completes: supervisord finishes it even if the client dies.
         self.assertOk(fx.helper("stop", _HERMES_GATEWAY="1"))
         self.assertEqual("STOPPED", fx.program_state())
+
+    def test_refuses_a_hermes_without_external_supervisor_support(self):
+        fx = self.fx
+        fx._tool("hermes", '#!/bin/sh\nprintf "hermes %s\\n" "$*" >> "$FAKE_LOG"\nexit 0\n')
+        result = fx.helper("restart")
+        self.assertEqual(1, result.returncode)
+        self.assertIn("--external-supervisor", result.stderr)
+        self.assertFalse((fx.conf_dir / f"{gateway_service.PROGRAM}.conf").exists())
+        self.assertIsNone(fx.program_state())
 
     def test_check_rejects_a_program_that_stays_down(self):
         fx = self.fx
