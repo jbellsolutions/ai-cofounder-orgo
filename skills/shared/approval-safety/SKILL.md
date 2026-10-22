@@ -25,6 +25,13 @@ An agent never discloses credentials, expands its own permission, fabricates
 approval, bypasses policy, alters the audit record, disables security, trusts
 an unknown peer, or deletes a profile or computer through the Agent Factory.
 
+An agent never stops, restarts, or signals its own gateway or supervisord, not
+even to load a config change. A restart started from inside the gateway is
+killed before it finishes, and the team goes silent. Say that a restart is
+needed and ask the owner to send `/restart` or run
+`supervisorctl restart cofounder-gateway`. If gateway-guard blocks a call, do
+not look for another way around it.
+
 Approval must identify request, action, scope, approver, time, expiry or
 one-time use, and required verification. Approval for one action never carries
 to a materially changed audience, message, amount, term, or system.

@@ -23,6 +23,7 @@ from typing import Any
 
 
 NAME = re.compile(r"^[a-z0-9][a-z0-9-]{0,62}$")
+GUARD_PLUGIN = "gateway-guard"
 MODEL_SECRET_KEYS = {
     "AI_GATEWAY_API_KEY", "ANTHROPIC_API_KEY", "CEREBRAS_API_KEY",
     "COHERE_API_KEY", "DASHSCOPE_API_KEY", "DEEPSEEK_API_KEY",
@@ -223,6 +224,9 @@ class Factory:
         if proposal["approval"].get("proposal_hash") != proposal["proposal_hash"]:
             raise ValueError("approval does not match proposal")
         directory, template = self.template(proposal["template_id"])
+        guard = self.assets / "plugins" / GUARD_PLUGIN
+        if not (guard / "plugin.yaml").is_file():
+            raise ValueError(f"the {GUARD_PLUGIN} plugin is missing from the installed assets")
         profiles_root = Path.home() / ".hermes/profiles"
         active_count = sum(1 for path in profiles_root.glob("*") if path.is_dir()) if profiles_root.exists() else 0
         if active_count >= int(self.policy["max_active_named_profiles"]):
@@ -238,6 +242,9 @@ class Factory:
         shared = self.assets / "skills" / "shared"
         if shared.exists():
             shutil.copytree(shared, home / "skills/shared", dirs_exist_ok=True)
+        # Each profile loads plugins from its own home, so a new role needs its
+        # own copy of the guard.
+        shutil.copytree(guard, home / "plugins" / GUARD_PLUGIN, dirs_exist_ok=True)
         metadata = home / "profile.yaml"
         existing = metadata.read_text().splitlines() if metadata.exists() else []
         existing = [line for line in existing if not line.startswith("display_name:")]
@@ -263,14 +270,18 @@ class Factory:
             "platform_toolsets.a2a": defaults["a2a_inbound_toolsets"],
         }.items():
             self._config_set(name, key, value)
+        self._run("hermes", "-p", name, "plugins", "enable", GUARD_PLUGIN, "--no-allow-tool-override")
 
         proposal["status"] = "active"
         proposal["activated_at"] = now()
+        # The factory runs inside the gateway, so it does not restart it: a
+        # restart started from here is killed by the gateway's own drain. The
+        # owner sends /restart to load the new profile.
+        proposal["restart_required"] = True
         write_private(self.proposals / f"{proposal_id}.json", proposal)
         allowlist, routes = self._current_dynamic_routes()
         self._config_set("default", "gateway.multiplex_profile_allowlist", allowlist)
         self._config_set("default", "gateway.platforms.a2a.extra.agents", routes)
-        self._run("hermes", "gateway", "restart")
         return proposal
 
 

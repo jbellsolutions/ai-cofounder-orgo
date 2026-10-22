@@ -15,6 +15,8 @@ import sys
 import time
 from typing import Any
 
+import gateway_service
+
 
 SAFE_ID = re.compile(r"^[a-z0-9][a-z0-9-]{0,62}$")
 RUN_ID = re.compile(r"^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,95}$")
@@ -35,6 +37,7 @@ def managed_paths(home: Path) -> list[Path]:
         hermes / "skills/shared",
         hermes / "skills/roles/ai-cofounder",
         hermes / "plugins/latitude-observer",
+        hermes / "plugins/gateway-guard",
         hermes / "cofounder/assets",
         hermes / "cofounder/services",
         hermes / "cofounder/company",
@@ -46,6 +49,7 @@ def managed_paths(home: Path) -> list[Path]:
             profile_home / "config.yaml",
             profile_home / "SOUL.md",
             profile_home / "skills",
+            profile_home / "plugins/gateway-guard",
             profile_home / "profile.yaml",
             profile_home / ".ai-cofounder-role",
         ))
@@ -115,10 +119,14 @@ def restore(home: Path, backup: Path) -> None:
         current_path.chmod(0o600)
 
 
-def gateway(action: str) -> None:
-    if not shutil.which("hermes"):
-        return
-    run(["hermes", "gateway", action], check=False)
+def gateway(action: str) -> bool:
+    """Pause or restart the supervised gateway through supervisorctl; never raises."""
+    try:
+        print(getattr(gateway_service, action)())
+        return True
+    except Exception as exc:
+        print(f"Gateway {action} did not complete: {exc}", file=sys.stderr)
+        return False
 
 
 def emit(value: dict[str, Any]) -> None:
@@ -135,7 +143,7 @@ def deploy(args: argparse.Namespace, home: Path, state_root: Path) -> int:
         raise RuntimeError("release failed static verification before installation")
 
     backup = snapshot(home, state_root, args.run_id)
-    gateway("stop")
+    gateway("pause")
     try:
         installed = run([
             sys.executable,
@@ -146,12 +154,13 @@ def deploy(args: argparse.Namespace, home: Path, state_root: Path) -> int:
         ], check=False)
         if installed.returncode:
             raise RuntimeError("profile installation did not complete")
-        gateway("restart")
+        if not gateway("restart"):
+            raise RuntimeError("the supervised gateway did not restart")
         verified = run([str(release / "orgo/verify.sh"), "--allow-unconnected"], check=False)
         if verified.returncode:
             raise RuntimeError("post-update verification did not pass")
     except Exception:
-        gateway("stop")
+        gateway("pause")
         restore(home, backup)
         gateway("restart")
         emit({"action": "deploy", "status": "rolled-back", "run_id": args.run_id, "target": args.target_id})
@@ -174,7 +183,7 @@ def rollback(args: argparse.Namespace, home: Path, state_root: Path) -> int:
     backup = state_root / "backups" / args.run_id
     if not (backup / "manifest.json").is_file():
         raise ValueError("no rollback snapshot exists for this run")
-    gateway("stop")
+    gateway("pause")
     restore(home, backup)
     gateway("restart")
     emit({"action": "rollback", "status": "restored", "run_id": args.run_id, "target": args.target_id})

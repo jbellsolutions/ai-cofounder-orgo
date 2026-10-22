@@ -15,8 +15,9 @@ echo "business-app credentials are removed from every named profile."
 python3 "$REPO_DIR/services/install_profiles.py" \
   --root "$REPO_DIR" --home "$HERMES_HOME" --mode team
 
-hermes gateway install >/dev/null
-hermes gateway restart >/dev/null 2>&1 || hermes gateway start >/dev/null
+# One supervised gateway serves every profile. On Orgo, `hermes gateway
+# install` installs nothing and `restart` runs the gateway in this shell.
+python3 "$REPO_DIR/services/gateway_service.py" restart
 "$REPO_DIR/orgo/verify.sh" --allow-unconnected
 
 cat <<'TEXT'

@@ -80,7 +80,8 @@ def agent_activate(proposal_id: str) -> str:
     """Activate an already owner-approved proposal and register its safe A2A route.
 
     This call cannot create approval. It fails closed unless the private
-    proposal carries a matching one-time owner approval record.
+    proposal carries a matching one-time owner approval record. It does not
+    restart the gateway; the owner does that to load the new profile.
     """
     proposal = Factory().activate(proposal_id)
     return json.dumps({
@@ -88,6 +89,10 @@ def agent_activate(proposal_id: str) -> str:
         "status": proposal["status"],
         "profile_name": proposal["profile_name"],
         "activated_at": proposal.get("activated_at"),
+        "next_step": (
+            "Ask the owner to send /restart in Slack or Telegram, or to run "
+            "`supervisorctl restart cofounder-gateway`, so the gateway serves the new profile."
+        ),
     }, indent=2)
 
 

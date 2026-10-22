@@ -34,9 +34,11 @@ write tools, and its own A2A route after activation.
 7. The factory checks template allowlist, unique name, existing manager,
    approval match, profile cap, role files, safe toolsets, and route uniqueness.
 8. It creates the profile from the working model connection, strips channel and
-   business-app credentials, installs the role and shared skills, registers the
-   profile with Bot Mode and A2A, and restarts the multiplex gateway.
-9. The Co-Founder assigns a safe identity and permission test before real work.
+   business-app credentials, installs the role and shared skills and the
+   `gateway-guard` plugin, and registers the profile with Bot Mode and A2A.
+9. The factory runs inside the gateway, so it does not restart it. The
+   Co-Founder asks the owner to send `/restart`, which loads the new profile.
+10. The Co-Founder assigns a safe identity and permission test before real work.
 
 ## Tools intentionally absent
 

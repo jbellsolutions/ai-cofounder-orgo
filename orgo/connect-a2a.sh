@@ -2,6 +2,7 @@
 # Connect the whole local profile roster to one authenticated A2A peer.
 set -euo pipefail
 
+REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 HERMES_HOME="${HERMES_HOME:-$HOME/.hermes}"
 ENV_FILE="$HERMES_HOME/.env"
 CONFIG_FILE="$HERMES_HOME/config.yaml"
@@ -75,6 +76,6 @@ done
 unset outgoing
 
 chmod 600 "$CONFIG_FILE" 2>/dev/null || true
-hermes gateway restart >/dev/null 2>&1 || true
+python3 "$REPO_DIR/services/gateway_service.py" restart
 echo "A2A is configured for the trusted peer and every installed team profile."
 echo "Test the peer's Agent Card, then send one harmless readiness request."
